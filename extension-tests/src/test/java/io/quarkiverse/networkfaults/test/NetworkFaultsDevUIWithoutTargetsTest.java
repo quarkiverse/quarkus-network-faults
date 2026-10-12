@@ -1,4 +1,4 @@
-package io.quarkiverse.networkfaults.restclient.test;
+package io.quarkiverse.networkfaults.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

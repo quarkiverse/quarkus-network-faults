@@ -17,6 +17,7 @@
         <module>core</module>
         <module>junit</module>
         <module>extensions</module>
+        <module>extension-tests</module>
         <module>docs</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package io.quarkiverse.networkfaults.restclient.test;
+package io.quarkiverse.networkfaults.test;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;

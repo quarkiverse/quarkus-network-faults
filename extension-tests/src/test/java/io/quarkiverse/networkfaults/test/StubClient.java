@@ -1,4 +1,4 @@
-package io.quarkiverse.networkfaults.restclient.test;
+package io.quarkiverse.networkfaults.test;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

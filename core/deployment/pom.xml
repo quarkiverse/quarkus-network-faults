@@ -42,11 +42,6 @@
             <artifactId>quarkus-network-faults-dev</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit-internal</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
