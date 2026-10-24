@@ -36,8 +36,9 @@ final class Listener {
     private BlackHole blackHole;
     private int port;
 
-    Listener(ProxyTarget target) {
+    Listener(ProxyTarget target, int port) {
         this.target = target;
+        this.port = port;
     }
 
     private Vertx vertx() {

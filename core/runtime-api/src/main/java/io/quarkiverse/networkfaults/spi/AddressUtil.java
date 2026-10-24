@@ -1,5 +1,8 @@
 package io.quarkiverse.networkfaults.spi;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -18,6 +21,29 @@ public final class AddressUtil {
      * Every proxy listens here.
      */
     public static final String PROXY_HOST = "127.0.0.1";
+
+    /**
+     * Reserves an ephemeral port for a proxy that must be known before the upstream starts, such as a Kafka
+     * broker that needs to advertise the proxy address. The port is released immediately; the proxy's
+     * {@code Listener} binds to it shortly after, retrying for three seconds if something else takes it.
+     */
+    public static int reservePort() {
+        IOException last = null;
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try (ServerSocket s = new ServerSocket(0)) {
+                return s.getLocalPort();
+            } catch (IOException e) {
+                last = e;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        throw new UncheckedIOException("cannot reserve a proxy port after 3 attempts", last);
+    }
 
     // Schemes whose upstream speaks plaintext HTTP/1.x, which the proxy can read; https and wss reach it encrypted.
     private static final Set<String> HTTP_SCHEMES = Set.of("http", "ws");

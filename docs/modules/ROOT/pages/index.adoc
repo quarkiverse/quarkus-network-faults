@@ -117,8 +117,7 @@ The Quarkus Network Faults extension builds the proxy into the test run and take
 * A fault that never reached the code under test fails the test
 * Requests are counted, so a retry or an open circuit breaker is something a test can assert
 
-Toxiproxy remains the tool for what an in-process proxy cannot reach.
-Kafka clients reconnect to the address the broker advertises, which bypasses the proxy after the first connection, and a `@QuarkusIntegrationTest` runs a packaged application the extension is not part of.
+Toxiproxy remains the tool for what an in-process proxy cannot reach: a `@QuarkusIntegrationTest` runs a packaged application the extension is not part of.
 See xref:targets.adoc#limitations[Limitations] for the details.
 
 #Inside those limits, a fault test is an ordinary `@QuarkusTest` with one more injected bean.#

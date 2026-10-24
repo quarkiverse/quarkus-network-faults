@@ -184,6 +184,13 @@ public final class ProxyRegistry {
      * @throws IllegalStateException if the registry is closed
      */
     public ProxyTarget targetFor(TargetName name, Upstream upstream, String sourceProperty) {
+        return targetFor(name, upstream, sourceProperty, 0);
+    }
+
+    /**
+     * Like {@link #targetFor(TargetName, Upstream, String)}, binding the proxy to {@code port} when it is not zero.
+     */
+    public ProxyTarget targetFor(TargetName name, Upstream upstream, String sourceProperty, int port) {
         lock.lock();
         try {
             if (closed) {
@@ -204,7 +211,7 @@ public final class ProxyRegistry {
                 free = name.withInstance(n);
                 taken = targets.get(free);
             }
-            ProxyTarget created = new ProxyTarget(this, free, upstream, sourceProperty, eventCapacity);
+            ProxyTarget created = new ProxyTarget(this, free, upstream, sourceProperty, eventCapacity, port);
             created.bind();
             targets.put(free, created);
             return created;

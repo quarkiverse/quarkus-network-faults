@@ -18,6 +18,13 @@ package io.quarkiverse.networkfaults.spi;
 public record TargetDescriptor(String property, Class<? extends AddressRewriter> rewriter, TargetName name) {
 
     /**
+     * Config key prefix for proxy ports reserved by a dev service customizer. A property
+     * {@code quarkus.network-faults.reserved-port.<endpoint-property>} tells the interceptor to bind the proxy to
+     * that port instead of an OS-allocated one, so the broker can advertise it.
+     */
+    public static final String RESERVED_PORT_PREFIX = "quarkus.network-faults.reserved-port.";
+
+    /**
      * A configured name as one segment of a property name: quoted when it contains dots, as SmallRye Config
      * spells it ({@code quarkus.datasource."my.ds".jdbc.url}).
      */

@@ -4,6 +4,7 @@ import jakarta.annotation.Priority;
 
 import io.quarkiverse.networkfaults.runtime.internal.NetworkFaultsRuntime;
 import io.quarkiverse.networkfaults.spi.AddressRewriter;
+import io.quarkiverse.networkfaults.spi.TargetDescriptor;
 import io.quarkiverse.networkfaults.spi.Upstream;
 import io.smallrye.config.ConfigSourceInterceptor;
 import io.smallrye.config.ConfigSourceInterceptorContext;
@@ -45,7 +46,9 @@ public class NetworkFaultsInterceptor implements ConfigSourceInterceptor {
 
         @Override
         public int proxyPort(Upstream upstream) {
-            return NetworkFaultsRuntime.proxyPort(match, upstream);
+            String portStr = neighbour(TargetDescriptor.RESERVED_PORT_PREFIX + match.property());
+            int port = portStr != null ? Integer.parseInt(portStr) : 0;
+            return NetworkFaultsRuntime.proxyPort(match, upstream, port);
         }
 
         @Override

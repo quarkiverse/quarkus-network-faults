@@ -47,12 +47,12 @@ public final class ProxyTarget {
     private String previousFault = "none";
 
     ProxyTarget(ProxyRegistry registry, TargetName name, Upstream upstream, String sourceProperty,
-            int eventCapacity) {
+            int eventCapacity, int port) {
         this.registry = registry;
         this.name = name;
         this.upstream = upstream;
         this.sourceProperty = sourceProperty;
-        this.listener = new Listener(this);
+        this.listener = new Listener(this, port);
         this.stats = new TargetStats(eventCapacity);
     }
 

@@ -117,10 +117,10 @@ public final class NetworkFaultsRuntime {
      * The port of the proxy standing in for one upstream address of a matched property; the registry decides
      * which proxy that is and creates it on first sight.
      */
-    public static int proxyPort(TargetCatalog.Match match, Upstream upstream) {
+    public static int proxyPort(TargetCatalog.Match match, Upstream upstream, int port) {
         TargetName name = match.targetName().substitute(
                 Map.of(TargetName.HOST, upstream.host(), TargetName.PORT, Integer.toString(upstream.port())));
-        return registry().targetFor(name, upstream, match.property()).port();
+        return registry().targetFor(name, upstream, match.property(), port).port();
     }
 
     /**

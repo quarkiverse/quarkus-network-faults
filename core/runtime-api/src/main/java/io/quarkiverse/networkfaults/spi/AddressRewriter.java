@@ -20,7 +20,8 @@ public interface AddressRewriter {
         String property();
 
         /**
-         * The port of the proxy standing in for one upstream address.
+         * The port of the proxy standing in for one upstream address. When a reserved port exists for this
+         * property, the proxy binds to it; otherwise an ephemeral port is allocated.
          */
         int proxyPort(Upstream upstream);
 

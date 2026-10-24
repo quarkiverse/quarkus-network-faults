@@ -25,6 +25,11 @@
             <artifactId>quarkus-network-faults-kafka-client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-devservices-common</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 </project>

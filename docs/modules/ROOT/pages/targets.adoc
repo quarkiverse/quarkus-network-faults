@@ -234,18 +234,45 @@ TIP: A channel keeps its connection, so drop the connections of the target befor
 [#kafka]
 == Kafka
 
-The bootstrap address is proxied, so `faults.target(MutinyEmitter.class, channel("orders-out"))` exists and the first metadata fetch goes through it.
+The bootstrap address and every broker the client discovers through metadata are proxied.
 Any bean injected with `@Channel`, an `Emitter` or `MutinyEmitter`, and the `KafkaClientService` resolve to every broker.
 
-[WARNING]
-.Only the bootstrap connection is proxied
-====
-The broker advertises its real address in the metadata and the client connects there directly, so faults on the Kafka target do not reach the producer or consumer.
-The test `KafkaBootstrapOnlyTest` pins this.
+=== Dev Services
 
-Making Kafka faults real needs the Dev Services launchers to advertise a port the proxy reserves, which is a change inside Quarkus.
-Until then, use the Kafka companion with Toxiproxy for that case.
-====
+With standard Kafka Dev Services (Testcontainers), the extension automatically patches the broker so it advertises the proxy port.
+All supported providers work out of the box: upstream Kafka, upstream Kafka native, Strimzi, and Redpanda.
+Drop existing connections before applying a fault so the client reconnects through the proxy:
+
+[source,java]
+----
+Target kafka = faults.target(MutinyEmitter.class, channel("orders-out"));
+kafka.dropConnections();
+try (ActiveFault f = kafka.unavailable()) {
+    // the producer cannot reach the broker
+}
+----
+
+=== Compose Dev Services
+
+When Kafka runs via Compose Dev Services or any external broker, the extension cannot patch the broker automatically.
+Configure it manually in two steps:
+
+. In the Compose file (or broker config), set the advertised listener to a fixed port:
++
+[source,yaml]
+----
+environment:
+  KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092
+----
+
+. In `application.properties`, tell the proxy to bind to that port:
++
+[source,properties]
+----
+quarkus.network-faults.reserved-port.kafka.bootstrap.servers=19092
+----
+
+The proxy binds to port 19092, the interceptor rewrites `kafka.bootstrap.servers` to point there, and the broker advertises the same port, so reconnections after metadata refresh go through the proxy.
 
 == Quarkus LangChain4j
 
@@ -268,7 +295,7 @@ See xref:guide-langchain4j.adoc[Testing Quarkus LangChain4j models], which cover
 The proxy sits where the configuration of the application says a dependency is.
 What it cannot do follows from that.
 
-* *Clients that learn addresses from the server.* Kafka, Redis in cluster or sentinel mode, MongoDB replica sets, and anything else that advertises its own address bypasses the proxy after the first connection. Standalone servers are fine.
+* *Clients that learn addresses from the server.* Redis in cluster or sentinel mode, MongoDB replica sets, and anything else that advertises its own address bypasses the proxy after the first connection. Standalone servers are fine. Kafka is handled: see xref:#kafka[Kafka].
 * *TLS.* TLS connections pass through, but the certificate must be valid for `127.0.0.1`, and the `Host` header and SNI change with the rewritten URL. That is fine for local stubs, not for real hosts.
 * *HTTP over TLS or HTTP/2.* Everything that reads HTTP needs plaintext HTTP/1.x: request counting, `http().respondsWith(status)`, faults on xref:faults.adoc#some-requests[some requests], and the moments under `Moment.Http`. Over TLS the bytes are relayed opaquely, requests are not counted, and applying an HTTP fault throws `UnsupportedOperationException`.
 * *Multi-host JDBC URLs.* They are left untouched. Reactive URL lists get one proxy per entry.
