@@ -247,7 +247,7 @@ addresses one by the bean the application injects.
 | Mailer | `target(Mailer.class)`, a named one with its `@MailerName` literal; with `quarkus.mailer.mock=false` |
 | SmallRye GraphQL client | the typesafe interface, or a dynamic client by name |
 | gRPC client | `target(Greeter.class, GrpcClient.Literal.of("greeter"))` |
-| Kafka | the emitter or client bean; bootstrap connection only, see below |
+| Kafka | the emitter or client bean |
 | Quarkus LangChain4j | `target(ChatModel.class, ModelName.Literal.of("name"))` or the AI service; chat memory and embedding stores through the client behind them, Chroma by URL; MCP servers with `target(McpClient.class, McpClientName.Literal.of("name"))` |
 
 The faults: `unavailable`, `connectTimeout`, `hangs`, `slow`, `diesMidRequest`, `closes`,
@@ -269,9 +269,6 @@ client timeout defaults these tests tend to surface.
 
 ## Known limitations
 
-- Kafka: only the bootstrap connection is proxied; the client reconnects to the broker's
-  advertised address. Redis in cluster or sentinel mode and MongoDB replica sets bypass the
-  proxy the same way; standalone servers are fine.
 - `connectTimeout()` is Linux only.
 - TLS passes through but certificates must accept `127.0.0.1`; request counting and the HTTP
   faults need plaintext HTTP/1.x.
