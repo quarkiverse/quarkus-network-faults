@@ -104,9 +104,17 @@ try (var ignored = faults.target(DataSource.class).hangs()) {
 A test that applies a fault no request went through fails, with a message naming the
 configuration property to look at. A fault test cannot pass by accident.
 
+### Sixteen classic problems, one test each
+
+The application behind the [Introducing Quarkus Network Faults](https://quarkus.io/blog/quarkus-network-faults/)
+blog post is `samples/resilient-orders`: one order service, and sixteen tests that each pin one
+protection against a dependency that hangs, fails, rate-limits or answers late, a payment whose
+response is lost, a database that hangs, restarts or dies mid-transaction, Kafka, Redis and an LLM
+provider. Its README says what each test catches.
+
 ### Three incidents, reproduced
 
-Each module under `samples/` is one small application with a bug a network fault finds, a
+The modules below are the other shape: one small application with a bug a network fault finds, a
 `@QuarkusTest` that shows it, and a `@TestProfile` that switches the fix on so the same scenario
 passes.
 

@@ -3,8 +3,11 @@
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
 
-Every module under https://github.com/quarkiverse/quarkus-network-faults/tree/main/samples[`samples/`] is one small application with a bug, a `@QuarkusTest` that shows it, and a `@TestProfile` that switches the fix on so the same scenario passes.
+Each module listed here, under https://github.com/quarkiverse/quarkus-network-faults/tree/main/samples[`samples/`], is one small application with a bug, a `@QuarkusTest` that shows it, and a `@TestProfile` that switches the fix on so the same scenario passes.
 Each has a README that says which test to read first.
+
+The application of the https://quarkus.io/blog/quarkus-network-faults/[Introducing Quarkus Network Faults] blog post is the other shape, in https://github.com/quarkiverse/quarkus-network-faults/tree/main/samples/resilient-orders[`samples/resilient-orders`]: one order service with a REST Client, a database, Kafka, Redis and an LLM provider, and sixteen tests that each pin one protection, a lost payment response, a database that restarts or dies mid-transaction and a poison message among them.
+Its README says what each test catches.
 
 The first three are found with a network fault on the dependency; the other eight with `exhausted()`, `workerPool()` or `eventLoops()`, and need no `NetworkFaultsProfile`.
 
@@ -74,6 +77,13 @@ Then:
 [source,bash]
 ----
 ./mvnw -pl samples/stalled-stream test
+----
+
+The blog post's application is a build of its own, and needs Docker for Kafka and Redis as well:
+
+[source,bash]
+----
+./mvnw -f samples/resilient-orders/pom.xml verify
 ----
 
 == Going Further

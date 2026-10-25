@@ -59,3 +59,6 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B clean install -Dno-format
+
+      - name: Test the resilient-orders sample
+        run: mvn -B -f samples/resilient-orders/pom.xml verify
