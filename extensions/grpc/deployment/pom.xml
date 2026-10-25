@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.quarkiverse.networkfaults</groupId>
         <artifactId>quarkus-network-faults-grpc-parent</artifactId>
-        <version>0.3.0</version>
+        <version>999-SNAPSHOT</version>
     </parent>
     <artifactId>quarkus-network-faults-grpc-deployment</artifactId>
     <name>Quarkus Network Faults - gRPC - Deployment</name>
