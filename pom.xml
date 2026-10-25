@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.quarkiverse.networkfaults</groupId>
     <artifactId>quarkus-network-faults-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
     <name>Quarkus Network Faults - Parent</name>
 
@@ -25,7 +25,7 @@
         <connection>scm:git:git@github.com:quarkiverse/quarkus-network-faults.git</connection>
         <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-network-faults.git</developerConnection>
         <url>https://github.com/quarkiverse/quarkus-network-faults</url>
-      <tag>HEAD</tag>
+      <tag>0.3.0</tag>
   </scm>
 
     <properties>
