@@ -270,6 +270,7 @@ try (ActiveFault hang = faults.target(InventoryClient::reserve).hangs();
 A method reference must be of the form `Type::method`: a lambda, or a reference bound to an instance such as `client::reserve`, throws `IllegalArgumentException`.
 A method with up to five parameters can be named, and one that is overloaded with the same number of parameters needs a cast to pick one.
 
+[#advanced-faults]
 == Advanced Faults
 
 `advanced()` holds faults in the style of the toxics of Toxiproxy, for tests that need more control than the faults above.
@@ -296,6 +297,9 @@ try (ActiveFault f = target.advanced().latency(Duration.ofMillis(100),
     // every request is delayed by 100 to 150 ms on its way to the upstream
 }
 ----
+
+`bandwidth` is what a test of backpressure needs: a transfer that cannot go faster than the network, to check that the application produces at that pace rather than ahead of it.
+See xref:guide-backpressure.adoc[Testing backpressure].
 
 == Every Target at Once
 

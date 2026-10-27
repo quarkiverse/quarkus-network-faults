@@ -1,0 +1,140 @@
+= Testing Backpressure
+
+include::./includes/attributes.adoc[]
+include::./includes/customization.adoc[]
+
+Backpressure is what keeps an application from producing data faster than the network takes it.
+On a fast network an application that has it and one that builds everything in memory first are hard to tell apart: both finish in milliseconds.
+The proxy can make the network slow, and then the difference shows.
+
+This guide shows how to:
+
+* Throttle the connection to a dependency
+* Tell an application that waits for the network from one that runs ahead of it
+* Size the transfer, and the read timeout of the client, so the test measures the right thing
+
+== Prerequisites
+
+The test class uses the `NetworkFaultsProfile` test profile and injects `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+
+The snippets are taken from `BackpressureTest` in `integration-tests/rest-client-and-datasource`.
+
+== What the Test Shows
+
+The sample application streams a 64 MB export to the inventory service, through a REST Client method that takes a `Multi<byte[]>` body.
+The test throttles the connection to 32 MB/s with the `bandwidth` fault and asserts two things from the response:
+
+* The upload took about two seconds, which proves the throttle acted on it
+* The last chunk was produced in the second half of the transfer, which proves the application waited for the network instead of building the export in memory
+
+The second assertion is the one about backpressure.
+The first is there so that the second cannot pass by accident: on a fast network everything is over in a few milliseconds, and an application that buffers would pass too.
+
+== The Application under Test
+
+The export is 1024 chunks of 64 KB, built one by one as the REST Client asks for them.
+The resource notes when the last chunk was taken and when the inventory service acknowledged the whole upload, and answers with the two durations in milliseconds:
+
+[source,java]
+----
+@POST
+public Uni<String> export() {
+    long start = System.nanoTime();
+    AtomicLong producedAt = new AtomicLong();
+    byte[] chunk = new byte[CHUNK_SIZE];
+    Multi<byte[]> body = Multi.createFrom().range(0, CHUNKS)
+            .map(i -> chunk)
+            .onCompletion().invoke(() -> producedAt.set(System.nanoTime())); // <1>
+    return export.upload(body)
+            .map(received -> millisSince(start, producedAt.get()) + " " + millisSince(start, System.nanoTime())); // <2>
+}
+----
+<1> The stream completes only once the last chunk was taken, so this is when the application finished producing.
+<2> The time the last chunk was taken, then the time the upload was acknowledged, both in milliseconds since the request started.
+
+The REST Client asks the `Multi` for the next chunk only when the write queue of the HTTP request has room.
+With the network throttled, the queue has room at the pace of the network, and so the chunks are produced at that pace.
+
+== The Test
+
+[source,java]
+----
+@Test
+public void exportIsPacedByTheNetwork() {
+    // ExportResource sends 64 MB: at 32 MB/s the upload takes about two seconds
+    try (ActiveFault f = faults.target(ExportClient.class).advanced().bandwidth(32 * MB,
+            Advanced.Direction.UPSTREAM)) {
+        String[] millis = when()
+                .post("/export")
+                .then()
+                .statusCode(200)
+                .extract()
+                .asString()
+                .split(" ");
+        long produced = Long.parseLong(millis[0]);
+        long uploaded = Long.parseLong(millis[1]);
+        assertTrue(uploaded >= 1_800,
+                "64 MB at 32 MB/s should take about 2 s, the upload took " + uploaded + " ms"); // <1>
+        assertTrue(produced >= uploaded / 2, "the export was produced in " + produced + " ms and uploaded in "
+                + uploaded + " ms: it was built ahead of the network, not paced by it"); // <2>
+    }
+}
+----
+<1> The throttle acted.
+<2> The application waited for the network.
+
+`bandwidth` takes the direction it acts on: `UPSTREAM` for what the application sends, as here, `DOWNSTREAM` for what it receives, or `BOTH`.
+The proxy relays only as fast as the rate allows, and once it holds about a megabyte the rate has not released yet it stops reading from the application.
+From there the pressure travels the way it does in production: the socket fills, the write queue of the request reports full, and the REST Client stops asking the `Multi` for chunks.
+
+== What the Numbers Look Like
+
+Three variants of the sample, measured on a developer machine:
+
+[cols="3,2,2",options="header"]
+|===
+|Variant |Last chunk produced |Upload acknowledged
+
+|The resource above
+|About 1.8 s
+|About 2.1 s
+
+|A resource that collects the export with `collect().asList()` before sending it
+|59 ms
+|2.1 s, and the second assertion fails with its message
+
+|The resource above, with the read timeout of the client at one second
+|The upload fails with a `TimeoutException` after one second, whatever the resource does
+|
+|===
+
+The first row is backpressure at work: the last chunk was produced a quarter of a second before the end of the upload, and that quarter of a second is the slack between the application and the throttle, the write queue of the client, the socket buffers of the kernel and the megabyte the proxy queues.
+The second row is what the test is there to catch.
+The third row is a trap for the test itself, explained next.
+
+== The Read Timeout
+
+IMPORTANT: The `read-timeout` of the REST Client is reset only by data the client receives, and nothing is received before the response.
+An upload that takes longer than the read timeout fails with a `TimeoutException` in the middle of the transfer, whatever the application does.
+
+A throttled transfer has to finish within the read timeout of the client that sends it.
+The sample gives the export a REST Client of its own, so that its read timeout can be long without touching the two-second timeout of the inventory client that the other guides rely on:
+
+[source,properties]
+----
+quarkus.rest-client.export.read-timeout=30000
+----
+
+== Sizing the Transfer
+
+The slack between the application and the throttle takes a few megabytes without waiting, however well the application waits, so a transfer of that size shows nothing.
+Keep the transfer large next to it: at 64 MB the slack is a tenth of the transfer, and the assertion asks for half, which leaves room for a slower build machine.
+The loopback network is far faster than any rate a test would set, so the rate alone decides how long the test takes; tens of megabytes per second keep it at a few seconds.
+
+== Going Further
+
+[.lead]
+* xref:faults.adoc#advanced-faults[Advanced Faults], for `latency` and `slice`, the other ways to slow a connection down
+* xref:guide-rest-client.adoc#streamed-responses[Streamed Responses], for a stream that is cut or stalls instead of slowing down
+* xref:timeouts.adoc[Client Timeout Defaults]
+* xref:guard.adoc[The Guard]

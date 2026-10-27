@@ -9,6 +9,7 @@
 * xref:guide-rest-client.adoc[Testing a failing REST dependency]
 * xref:guide-database.adoc[Testing a failing database]
 * xref:guide-pool-exhaustion.adoc[Testing pool exhaustion]
+* xref:guide-backpressure.adoc[Testing backpressure]
 * xref:guide-fault-tolerance.adoc[Fault Tolerance]
 * xref:guide-langchain4j.adoc[Testing Quarkus LangChain4j models]
 
