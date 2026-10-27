@@ -1,6 +1,7 @@
 package io.quarkiverse.networkfaults.it;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import io.vertx.core.Vertx;
@@ -37,6 +38,7 @@ public class InventoryServer implements QuarkusTestResourceLifecycleManager {
         switch (request.path()) {
             case "/inventory/reserve" -> request.response().end("reserved");
             case "/inventory/stock-updates" -> stockUpdates(request.response());
+            case "/inventory/export" -> export(request);
             default -> request.response().setStatusCode(404).end();
         }
     }
@@ -49,6 +51,15 @@ public class InventoryServer implements QuarkusTestResourceLifecycleManager {
         response.write("data: 1\n\n");
         response.write("data: 2\n\n");
         response.end("data: 3\n\n");
+    }
+
+    /**
+     * Counts the bytes of an upload and answers with the count once it ends.
+     */
+    private static void export(HttpServerRequest request) {
+        AtomicLong received = new AtomicLong();
+        request.handler(buffer -> received.addAndGet(buffer.length()));
+        request.endHandler(v -> request.response().end(String.valueOf(received.get())));
     }
 
     private void price(HttpServerRequest request) {
