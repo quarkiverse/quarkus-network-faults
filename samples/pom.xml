@@ -20,6 +20,9 @@
         <module>blocking-status-endpoint</module>
         <module>blocking-on-event-loop</module>
         <module>reactive-wait-queue</module>
+        <module>rest-client-default-timeout</module>
+        <module>stalled-stream</module>
+        <module>readiness-calls-dependency</module>
     </modules>
 
     <dependencies>

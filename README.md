@@ -104,6 +104,18 @@ try (var ignored = faults.target(DataSource.class).hangs()) {
 A test that applies a fault no request went through fails, with a message naming the
 configuration property to look at. A fault test cannot pass by accident.
 
+### Three incidents, reproduced
+
+Each module under `samples/` is one small application with a bug a network fault finds, a
+`@QuarkusTest` that shows it, and a `@TestProfile` that switches the fix on so the same scenario
+passes.
+
+| Module | The bug | The fix |
+|---|---|---|
+| `rest-client-default-timeout` | The REST Client is left on its defaults, so a hung inventory holds every order for thirty seconds | `read-timeout`, a bound the application chose |
+| `stalled-stream` | A Server-Sent Events stream goes quiet after its first event, and the read timeout does not fire: it is cancelled once the headers arrive | An idle timeout on the stream itself |
+| `readiness-calls-dependency` | The readiness check asks the inventory service, so one dependency down takes every pod out of rotation | Readiness reports the pod's own state |
+
 ## Overload, too
 
 In a `@QuarkusTest` your pools are always empty. In an incident they are full. `exhausted()` takes
@@ -127,8 +139,7 @@ Five questions you can answer in CI:
 - If all worker threads are busy, do `@NonBlocking` endpoints and `/q/health/live` still respond?
 - Did someone put a blocking call on a Vert.x event loop? (`faults.eventLoops().watched()`)
 
-Eight samples under `samples/` each reproduce one incident: a bug, a failing test and a
-`@TestProfile` that switches the fix on.
+Eight more samples under `samples/` each reproduce an overload incident, in the same shape.
 
 | Module | The bug | The fix |
 |---|---|---|

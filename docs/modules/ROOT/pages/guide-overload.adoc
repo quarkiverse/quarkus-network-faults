@@ -234,53 +234,8 @@ See xref:guard.adoc#exhausted-pools[The Guard] for what counts as having waited,
 
 == Eight Incidents, Reproduced
 
-Every module under `samples/` is one small application with an overload bug, a `@QuarkusTest` that fails on it, and a `@TestProfile` that switches the fix on so the same scenario passes.
-
-[cols="2,4,4",options="header"]
-|===
-|Module |The bug |The fix
-
-|`pool-exhausted-500`
-|Pool full: the endpoint throws and answers 500, so clients and balancers retry at once
-|An exception mapper answering 503 with `Retry-After`
-
-|`liveness-hits-database`
-|The liveness check queries the database, so a pod that is merely busy is killed and restarted
-|The database check is readiness only
-
-|`retry-amplification`
-|`@Retry` on the database call: one request asks the full pool four times, and the client's retry makes it eight
-|`@CircuitBreaker`: one attempt per request, then none, and it recovers when connections are back
-
-|`shared-audit-pool`
-|Audit writes use the default datasource, so a slow audit table takes the orders down with it
-|A named `audit` datasource with a pool of its own
-
-|`unbounded-worker-queue`
-|No `queue-size`: a blocking request waits for as long as it takes, and the client's deadline passes first
-|`quarkus.thread-pool.queue-size`, so the excess is answered 503 at once
-
-|`blocking-status-endpoint`
-|A status endpoint that does no I/O still needs a worker thread, so saturation takes it down too
-|`@NonBlocking`
-
-|`blocking-on-event-loop`
-|A `Uni` endpoint makes a JDBC call on the event loop; it only shows when the pool makes the call wait
-|`@Blocking`
-
-|`reactive-wait-queue`
-|No `max-wait-queue-size`: a query waits up to thirty seconds for a connection, and the client's deadline passes first
-|`quarkus.datasource.reactive.max-wait-queue-size`, so the excess fails at once
-|===
-
-Each sample has a README that says which test to read first.
-They need Docker for the PostgreSQL Dev Service, and the extension in the local Maven repository (`./mvnw install -DskipTests`).
-Then, for one of them:
-
-[source,bash]
-----
-./mvnw -pl samples/pool-exhausted-500 test
-----
+Every overload module under `samples/` is one small application with an overload bug, a `@QuarkusTest` that fails on it, and a `@TestProfile` that switches the fix on so the same scenario passes: a pool that answers 500, a liveness check that hits the database, a retry that multiplies the load, a shared audit pool, an unbounded worker queue, a status endpoint that blocks, a JDBC call on the event loop, and an unbounded reactive wait queue.
+They are listed, with the network incidents, on xref:samples.adoc[Incidents, Reproduced].
 
 == Going Further
 

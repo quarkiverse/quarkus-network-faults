@@ -13,6 +13,7 @@
 * xref:guide-backpressure.adoc[Testing backpressure]
 * xref:guide-fault-tolerance.adoc[Fault Tolerance]
 * xref:guide-langchain4j.adoc[Testing Quarkus LangChain4j models]
+* xref:samples.adoc[Incidents, reproduced]
 
 [.list-top-item]
 .Reference
