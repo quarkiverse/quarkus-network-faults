@@ -1,5 +1,5 @@
 name: Network Faults
-description: Inject network faults into the outbound connections of a Quarkus application during tests
+description: Inject network faults and overload into a Quarkus application during tests
 metadata:
   guide: https://docs.quarkiverse.io/quarkus-network-faults/dev/index.html
   keywords:

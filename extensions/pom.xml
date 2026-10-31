@@ -28,6 +28,7 @@
         <module>hibernate-orm</module>
         <module>mongodb</module>
         <module>mailer</module>
+        <module>vertx</module>
     </modules>
 
     <build>

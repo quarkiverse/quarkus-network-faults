@@ -2,8 +2,10 @@ package io.quarkiverse.networkfaults.runtime.internal;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,6 +17,8 @@ import io.quarkiverse.networkfaults.runtime.internal.proxy.ProxyTarget;
 import io.quarkiverse.networkfaults.runtime.internal.proxy.ProxyTarget.FaultHandle;
 import io.quarkiverse.networkfaults.runtime.internal.proxy.ProxyTarget.Outcome;
 import io.quarkiverse.networkfaults.spi.ConsequenceCleaner;
+import io.quarkiverse.networkfaults.spi.Exhaustion;
+import io.quarkiverse.networkfaults.spi.ResourceTarget;
 
 /**
  * Follows every fault handed to a test through {@link NetworkFaultsImpl}. When one ends, whichever way, two things
@@ -39,6 +43,10 @@ import io.quarkiverse.networkfaults.spi.ConsequenceCleaner;
  * <p>
  * A fault applied to a composite target is one group, judged by all of its members together: traffic through any
  * member is enough.
+ * <p>
+ * An exhaustion is a fault with no proxy: its guard is whether anything waited for the resource while it was held,
+ * and a resource whose waiters cannot be observed is not judged. It settles the same way, and it is recorded and
+ * reported the same way.
  */
 public final class FaultTracker {
 
@@ -46,6 +54,8 @@ public final class FaultTracker {
 
     private final List<ConsequenceCleaner> cleaners;
     private final Set<Group> active = new LinkedHashSet<>();
+    // target name -> the exhaustion holding it
+    private final Map<String, ResourceFault> exhausted = new LinkedHashMap<>();
     private final List<String> violations = new ArrayList<>();
     private final List<FaultListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -83,6 +93,50 @@ public final class FaultTracker {
     }
 
     /**
+     * A resource held in full as the test sees it: ending it gives the resource back and settles the fault.
+     */
+    private final class ResourceFault implements ActiveFault {
+        private final String target;
+        private final Exhaustion exhaustion;
+        private final FaultRecord record;
+
+        private ResourceFault(String target, Exhaustion exhaustion) {
+            this.target = target;
+            this.exhaustion = exhaustion;
+            this.record = new FaultRecord(Instant.now(), List.of(target), "exhausted");
+        }
+
+        @Override
+        public void end() {
+            boolean last;
+            synchronized (FaultTracker.this) {
+                if (!exhausted.remove(target, this)) {
+                    return;
+                }
+                last = exhausted.isEmpty();
+            }
+            try {
+                exhaustion.release();
+            } finally {
+                if (last) {
+                    cleanUp();
+                }
+                boolean watched = exhaustion.watched();
+                boolean contended = watched && exhaustion.contended();
+                if (watched && !contended) {
+                    synchronized (FaultTracker.this) {
+                        violations.add(target + " was exhausted, but nothing waited for it while it was:"
+                                + " the request under test does not use this target, so the fault was not tested");
+                    }
+                }
+                FaultEnd.Verdict verdict = !watched ? FaultEnd.Verdict.NOT_JUDGED
+                        : contended ? FaultEnd.Verdict.SAW_TRAFFIC : FaultEnd.Verdict.NO_TRAFFIC;
+                notifyEnded(record, new FaultEnd(Instant.now(), verdict, 0, 0));
+            }
+        }
+    }
+
+    /**
      * Tells {@code listener} of every fault that starts or ends from now on.
      */
     void addListener(FaultListener listener) {
@@ -92,13 +146,7 @@ public final class FaultTracker {
     Group track(List<FaultHandle> handles) {
         Group group = new Group(handles);
         // told before the group is active, so a concurrent end cannot reach a listener ahead of the start
-        for (FaultListener listener : listeners) {
-            try {
-                listener.started(group.record);
-            } catch (RuntimeException e) {
-                warn(listener, e);
-            }
-        }
+        notifyStarted(group.record);
         synchronized (this) {
             active.add(group);
         }
@@ -106,15 +154,58 @@ public final class FaultTracker {
     }
 
     /**
-     * Runs cleanup and the guard once per group, whichever way it ended.
+     * Takes the whole of {@code resource} as a fault on {@code targetName}. Recorded only once it is held, so a take
+     * that fails leaves nothing behind. A target with a network fault is refused: its traffic would never reach the
+     * wire the fault sits on.
+     */
+    ActiveFault trackExhaustion(String targetName, ResourceTarget resource) {
+        synchronized (this) {
+            if (exhausted.containsKey(targetName)) {
+                throw new IllegalStateException("Target " + targetName + " is already exhausted; end that fault before"
+                        + " applying another");
+            }
+            if (activeOn(targetName)) {
+                throw new IllegalStateException("Target " + targetName + " has an active network fault, which an"
+                        + " exhausted target would never meet; end that fault before exhausting it");
+            }
+        }
+        ResourceFault fault = new ResourceFault(targetName, resource.exhaust());
+        // told before the fault is active, so a concurrent end cannot reach a listener ahead of the start
+        notifyStarted(fault.record);
+        synchronized (this) {
+            exhausted.put(targetName, fault);
+        }
+        return fault;
+    }
+
+    /**
+     * Tells the listeners a fault has started; one listener failing does not stop the others.
+     */
+    private void notifyStarted(FaultRecord record) {
+        for (FaultListener listener : listeners) {
+            try {
+                listener.started(record);
+            } catch (RuntimeException e) {
+                warn(listener, e);
+            }
+        }
+    }
+
+    /**
+     * Runs cleanup and the guard once per group, whichever way it ended. Cleanup waits while anything is exhausted: a
+     * cleaner acts on every pool, so it could give back what an exhaustion holds, and the last exhaustion to end runs it.
      */
     private void settle(Group group) {
+        boolean clean;
         synchronized (this) {
             if (!active.remove(group)) {
                 return;
             }
+            clean = exhausted.isEmpty();
         }
-        cleanUp();
+        if (clean) {
+            cleanUp();
+        }
         List<FaultHandle> members = group.members;
         boolean observable = true;
         boolean traffic = false;
@@ -168,10 +259,13 @@ public final class FaultTracker {
             connections += outcome.connectionsSeen();
             requests += outcome.httpRequestsSeen();
         }
-        FaultEnd end = new FaultEnd(Instant.now(), verdict, connections, requests);
+        notifyEnded(group.record, new FaultEnd(Instant.now(), verdict, connections, requests));
+    }
+
+    private void notifyEnded(FaultRecord record, FaultEnd end) {
         for (FaultListener listener : listeners) {
             try {
-                listener.ended(group.record, end);
+                listener.ended(record, end);
             } catch (RuntimeException e) {
                 warn(listener, e);
             }
@@ -196,15 +290,38 @@ public final class FaultTracker {
     }
 
     /**
-     * Ends every fault still active, settling each one.
+     * Ends every fault still active, settling each one; see {@link #endEach}.
      */
     void endAll() {
-        List<Group> groups;
+        List<ActiveFault> faults;
         synchronized (this) {
-            groups = new ArrayList<>(active);
+            faults = new ArrayList<>(active);
+            faults.addAll(exhausted.values());
         }
-        for (Group g : groups) {
-            g.end();
+        endEach(faults);
+    }
+
+    /**
+     * Ends every one of {@code faults}, whatever the others do, then throws the first failure with the rest suppressed.
+     */
+    static void endEach(List<ActiveFault> faults) {
+        Throwable failure = null;
+        for (ActiveFault fault : faults) {
+            try {
+                fault.end();
+            } catch (RuntimeException | Error e) {
+                if (failure == null) {
+                    failure = e;
+                } else {
+                    failure.addSuppressed(e);
+                }
+            }
+        }
+        if (failure instanceof RuntimeException e) {
+            throw e;
+        }
+        if (failure instanceof Error e) {
+            throw e;
         }
     }
 
@@ -233,7 +350,28 @@ public final class FaultTracker {
      * How many faults are active right now.
      */
     synchronized int activeCount() {
-        return active.size();
+        return active.size() + exhausted.size();
+    }
+
+    /**
+     * Whether {@code targetName} is held by an exhaustion right now.
+     */
+    synchronized boolean exhausted(String targetName) {
+        return exhausted.containsKey(targetName);
+    }
+
+    /**
+     * Whether a network fault is active on {@code targetName} right now, alone or as a member of a composite target.
+     */
+    synchronized boolean activeOn(String targetName) {
+        for (Group g : active) {
+            for (FaultHandle h : g.members) {
+                if (h.target().name().equals(targetName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

@@ -1,0 +1,4 @@
+CREATE TABLE orders (
+    id   SERIAL PRIMARY KEY,
+    item VARCHAR(64) NOT NULL
+);

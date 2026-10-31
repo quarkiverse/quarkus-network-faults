@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.quarkiverse.networkfaults</groupId>
+        <artifactId>quarkus-network-faults-parent</artifactId>
+        <version>999-SNAPSHOT</version>
+    </parent>
+    <artifactId>quarkus-network-faults-samples-parent</artifactId>
+    <name>Quarkus Network Faults - Samples - Parent</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>pool-exhausted-500</module>
+        <module>liveness-hits-database</module>
+        <module>retry-amplification</module>
+        <module>shared-audit-pool</module>
+        <module>unbounded-worker-queue</module>
+        <module>blocking-status-endpoint</module>
+        <module>blocking-on-event-loop</module>
+        <module>reactive-wait-queue</module>
+    </modules>
+
+    <dependencies>
+        <!-- the extension is a test-only dependency, as it would be in a real application -->
+        <dependency>
+            <groupId>io.quarkiverse.networkfaults</groupId>
+            <artifactId>quarkus-network-faults-junit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- every sample is a Quarkus application with an overload bug, and the test that finds it -->
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

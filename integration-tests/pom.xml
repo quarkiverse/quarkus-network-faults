@@ -13,6 +13,10 @@
 
     <modules>
         <module>rest-client-and-datasource</module>
+        <module>overload-agroal</module>
+        <module>overload-reactive-datasource</module>
+        <module>overload-worker-pool</module>
+        <module>overload-event-loops</module>
         <module>kafka</module>
         <module>langchain4j</module>
         <module>langchain4j-mcp</module>

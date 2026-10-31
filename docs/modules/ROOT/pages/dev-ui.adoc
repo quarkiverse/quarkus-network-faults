@@ -87,6 +87,7 @@ This is what `traffic().httpRequests()` returns in a test, see xref:traffic.adoc
 
 Once a fault has ended, the _Fault_ column of its target says what it did: _saw n connection(s), m request(s)_, or _no traffic_ when nothing went through the proxy while it was active, which is the dev-mode form of xref:guard.adoc[the guard]: such a fault cannot have affected the application, and the target is probably not the one the request goes through.
 `unavailable` and `connect-timeout` read _not judged_ instead, as the guard exempts them: refused and dropped connections never reach the proxy, so what the application did is the evidence.
+So does an exhaustion the guard cannot watch, the worker pool and the pools listed in xref:guard.adoc#exhausted-pools[The Guard].
 
 Behind the column is a history of every fault applied since the application started, whether from the card, a Dev MCP tool or application code, capped at the last 500; the `getHistory` Dev MCP tool returns it in full.
 

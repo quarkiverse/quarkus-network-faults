@@ -34,7 +34,8 @@ public class OrdersWithoutFaultsTest {
 
     @Test
     public void usingTheBeanExplainsHowToEnableFaults() {
-        IllegalStateException e = assertThrows(IllegalStateException.class, () -> faults.target(DataSource.class));
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> faults.target(DataSource.class).unavailable());
         assertTrue(e.getMessage().contains("NetworkFaultsProfile"), e.getMessage());
     }
 

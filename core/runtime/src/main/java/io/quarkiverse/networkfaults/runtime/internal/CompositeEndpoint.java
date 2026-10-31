@@ -54,6 +54,19 @@ class CompositeEndpoint implements Endpoint {
     }
 
     /**
+     * An exhausted member takes no fault, and no reset of the connections its exhaustion holds, which would end that
+     * exhaustion unnoticed.
+     */
+    void requireNotExhausted() {
+        for (ProxyTarget t : members) {
+            if (tracker.exhausted(t.name())) {
+                throw new IllegalStateException("Target " + t.name() + " is exhausted, so nothing reaches its "
+                        + "connections and a fault there would meet nothing; end that fault before applying another");
+            }
+        }
+    }
+
+    /**
      * Applies one fault to every member, tracked as a single fault. A fault on some members only would be half a
      * fault, so every member is checked before any is touched.
      */
@@ -61,6 +74,7 @@ class CompositeEndpoint implements Endpoint {
         if (!scope.isAll() || fault.readsHttp()) {
             requireHttp(fault);
         }
+        requireNotExhausted();
         if (replacing && scope.isAll()) {
             tracker.endOn(members);
         }

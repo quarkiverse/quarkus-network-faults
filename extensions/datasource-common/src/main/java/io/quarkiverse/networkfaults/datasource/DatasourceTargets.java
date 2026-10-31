@@ -1,5 +1,7 @@
 package io.quarkiverse.networkfaults.datasource;
 
+import java.util.Optional;
+
 import io.quarkiverse.networkfaults.spi.TargetName;
 
 /**
@@ -27,5 +29,17 @@ public final class DatasourceTargets {
      */
     public static TargetName of(String datasource, boolean reactive) {
         return reactive ? reactive(datasource) : jdbc(datasource);
+    }
+
+    /**
+     * The datasource a JDBC or reactive connection name belongs to, the reverse of {@link #of}; empty for any other
+     * name.
+     */
+    public static Optional<String> datasourceOf(TargetName name, boolean reactive) {
+        if (name.instance() == 0 && FAMILY.equals(name.family()) && name.segments().size() == 2
+                && name.segments().get(1).equals(reactive ? "reactive" : "jdbc")) {
+            return Optional.of(name.segments().get(0));
+        }
+        return Optional.empty();
     }
 }

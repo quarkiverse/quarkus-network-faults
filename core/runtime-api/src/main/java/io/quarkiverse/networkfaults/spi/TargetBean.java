@@ -3,9 +3,13 @@ package io.quarkiverse.networkfaults.spi;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.inject.spi.Bean;
 
 /**
  * The CDI bean a test asks about, as its types and qualifiers: what {@link BeanTargetResolver}s map to a target.
@@ -13,6 +17,22 @@ import java.util.Set;
  * and the qualifiers the test passed.
  */
 public record TargetBean(Set<Type> types, Set<Annotation> qualifiers) {
+
+    /**
+     * The bean a test names by type and qualifiers. A caller-built varargs array may repeat a qualifier, so the
+     * qualifiers go into a set that tolerates duplicates rather than letting {@code Set.of} throw.
+     */
+    public static TargetBean of(Class<?> type, Annotation... qualifiers) {
+        return new TargetBean(Set.of(type), new LinkedHashSet<>(Arrays.asList(qualifiers)));
+    }
+
+    /**
+     * The bean an {@code Instance} resolves to, with its own types and qualifiers.
+     */
+    public static TargetBean of(Instance<?> instance) {
+        Bean<?> bean = instance.getHandle().getBean();
+        return new TargetBean(bean.getTypes(), bean.getQualifiers());
+    }
 
     /**
      * Whether any bean type is, extends or implements the given class.

@@ -226,7 +226,7 @@ Attempts.last(api.traffic().httpRequests(), 9).assertSameBody().assertGapsAtLeas
 `NetworkFaultsProfile` registers a guard: if a fault was active on a target and no connection went through that target's proxy while it was, the test fails after it finishes with:
 
 ```
-Network fault had no effect:
+Fault had no effect:
   Target [rest-client:inventory]: the 'slow 10ms' fault was active but no connection went
   through the proxy while it was, so it cannot have affected the test. Is the application
   really using quarkus.rest-client.inventory.url?

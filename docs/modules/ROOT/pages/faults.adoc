@@ -76,6 +76,33 @@ IMPORTANT: A fault on a whole target has it to itself. Applying a second while o
 
 NOTE: `connectTimeout()` relies on the Linux kernel silently dropping SYNs when the accept queue of a listener is full. On other operating systems it throws `UnsupportedOperationException`.
 
+[#overload-faults]
+== Exhausting a Pool
+
+A pool the application depends on can be used up as well, without a proxy:
+
+[cols="2,4",options="header"]
+|===
+|Fault |What the application sees
+
+|`pool(DataSource.class).exhausted()`
+|Every connection of the Agroal pool is held: `getConnection()` waits for the acquisition timeout and fails
+
+|`pool(Pool.class).exhausted()`
+|Every connection of the reactive pool is held: queries wait for the connection timeout, or fail at once past `max-wait-queue-size`
+
+|`workerPool().exhausted()`
+|Every worker thread is occupied: blocking requests queue or are rejected, non-blocking ones are unaffected
+
+|`eventLoops().watched()`
+|Not a fault: ending the window fails the test if an event loop was blocked meanwhile
+|===
+
+These need no `NetworkFaultsProfile`.
+A pool is addressed like a target, by the bean the application uses it through: `pool(DataSource.class)` and `target(DataSource.class)` are the pool and the connection of the same datasource.
+A network fault is refused on a target whose pool is exhausted, and the other way round, with `IllegalStateException`.
+See xref:guide-overload.adoc[Testing overload].
+
 [#moments]
 == Moments
 
@@ -323,6 +350,8 @@ When a fault ends, and after every test, the extension undoes them:
 * Agroal pools are flushed
 * Every SmallRye Fault Tolerance circuit breaker is reset
 
+While a target is still exhausted, all of the cleanup waits for the last exhaustion to end: a circuit breaker that opened meanwhile is reset then, and connections a network fault broke stay in the pool until then.
+
 `faults.resetAll()` ends every active fault and runs the same cleanup on demand.
 
 == Going Further
@@ -330,6 +359,7 @@ When a fault ends, and after every test, the extension undoes them:
 [.lead]
 * xref:targets.adoc[Targets Reference]
 * xref:traffic.adoc[Counting Calls]
+* xref:guide-overload.adoc[Testing overload]
 * xref:guard.adoc[The Guard]
 * xref:guide-rest-client.adoc[Testing a failing REST dependency]
 * xref:guide-database.adoc[Testing a failing database]

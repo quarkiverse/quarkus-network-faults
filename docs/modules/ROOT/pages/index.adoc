@@ -81,6 +81,9 @@ Use it to check:
 [.lead]
 *Retries and circuit breakers*, by counting the requests that were really sent.
 
+[.lead]
+*A pool that is full, a worker pool with no free thread, or an event loop that is blocked*, with no load generator and no network fault: the pool is taken whole for the duration of a block.
+
 == Where to Go Next?
 
 [cols="1,4", frame=none, grid=none]
@@ -96,6 +99,9 @@ Use it to check:
 
 | xref:guide-fault-tolerance.adoc[**Fault Tolerance**]
 | Exercise `@Timeout`, `@Fallback`, `@CircuitBreaker` and `@Retry` with the faults they exist for.
+
+| xref:guide-overload.adoc[**Overload**]
+| Exhaust a connection pool or the worker pool, and watch the event loops for blocking calls, from any `@QuarkusTest`.
 
 | xref:faults.adoc[**Reference Documentation**]
 | Every fault, every moment in a response it can strike at, and every target it can be applied to.

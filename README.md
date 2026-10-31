@@ -104,6 +104,43 @@ try (var ignored = faults.target(DataSource.class).hangs()) {
 A test that applies a fault no request went through fails, with a message naming the
 configuration property to look at. A fault test cannot pass by accident.
 
+## Overload, too
+
+In a `@QuarkusTest` your pools are always empty. In an incident they are full. `exhausted()` takes
+the whole pool for the duration of a block, so the next request meets what the 21st meets under
+load, with no load generator and no network fault, and no `NetworkFaultsProfile`:
+
+```java
+try (var ignored = faults.pool(DataSource.class).exhausted()) {
+    when().get("/orders").then().statusCode(503).header("Retry-After", "1");
+    when().get("/q/health/ready").then().statusCode(503);
+    when().get("/q/health/live").then().statusCode(200);
+}
+when().get("/orders").then().statusCode(200);
+```
+
+Five questions you can answer in CI:
+
+- If the DB pool is full, do we answer `503` with `Retry-After`, or crash with a `500`?
+- Does our `@CircuitBreaker` trip when the pool runs dry, and does the application recover?
+- If the `audit` database is out of connections, can users still place orders?
+- If all worker threads are busy, do `@NonBlocking` endpoints and `/q/health/live` still respond?
+- Did someone put a blocking call on a Vert.x event loop? (`faults.eventLoops().watched()`)
+
+Eight samples under `samples/` each reproduce one incident: a bug, a failing test and a
+`@TestProfile` that switches the fix on.
+
+| Module | The bug | The fix |
+|---|---|---|
+| `pool-exhausted-500` | Pool full: the endpoint answers 500, so clients and balancers retry at once | An exception mapper answering 503 with `Retry-After` |
+| `liveness-hits-database` | The liveness check queries the database, so a busy pod is restarted | The database check is readiness only |
+| `retry-amplification` | `@Retry` on the database call asks the full pool four times per request | `@CircuitBreaker`: one attempt, then none, and it recovers |
+| `shared-audit-pool` | Audit writes share the default datasource, so a slow audit table takes orders down | A named `audit` datasource with a pool of its own |
+| `unbounded-worker-queue` | No `queue-size`: a blocking request waits as long as it takes | `quarkus.thread-pool.queue-size`, so the excess is answered 503 |
+| `blocking-status-endpoint` | A status endpoint that does no I/O still needs a worker thread | `@NonBlocking` |
+| `blocking-on-event-loop` | A `Uni` endpoint makes a JDBC call on the event loop | `@Blocking` |
+| `reactive-wait-queue` | No `max-wait-queue-size`: a query waits thirty seconds for a connection | `quarkus.datasource.reactive.max-wait-queue-size` |
+
 ## See it before you test it
 
 In dev mode the **Network faults** card in the Dev UI lists every target of the running
@@ -241,6 +278,7 @@ addresses one by the bean the application injects.
 | JDBC datasource | `target(DataSource.class)`, a named one with its `@DataSource` literal |
 | Reactive datasource | `target(Pool.class)` |
 | Hibernate ORM, Hibernate Reactive, Quarkus Data, Jakarta Data | `target(EntityManager.class)`, `target(Mutiny.SessionFactory.class)` or the repository type, resolved to the datasource behind it |
+| Connection pools and threads | `pool(DataSource.class).exhausted()`, `pool(Pool.class).exhausted()`, `workerPool().exhausted()` for the worker pool, `eventLoops().watched()` for blocked event loops; no profile needed |
 | REST Client | `target(InventoryClient.class)`, the interface; `target(InventoryClient::reserve)` for one method's requests |
 | Redis | `target(RedisDataSource.class)`, or the Vert.x clients; standalone mode |
 | MongoDB | `target(MongoClient.class)` or the reactive client; standalone servers |

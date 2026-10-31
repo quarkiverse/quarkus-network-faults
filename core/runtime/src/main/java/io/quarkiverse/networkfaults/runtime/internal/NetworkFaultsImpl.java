@@ -3,26 +3,29 @@ package io.quarkiverse.networkfaults.runtime.internal;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.enterprise.inject.Instance;
-import jakarta.enterprise.inject.spi.Bean;
 
 import io.quarkiverse.networkfaults.ActiveFault;
 import io.quarkiverse.networkfaults.Endpoint;
+import io.quarkiverse.networkfaults.EventLoops;
+import io.quarkiverse.networkfaults.Exhaustible;
 import io.quarkiverse.networkfaults.MethodReference;
 import io.quarkiverse.networkfaults.NetworkFaults;
 import io.quarkiverse.networkfaults.runtime.internal.proxy.ProxyRegistry;
 import io.quarkiverse.networkfaults.runtime.internal.proxy.ProxyTarget;
 import io.quarkiverse.networkfaults.spi.BeanTargetResolver;
 import io.quarkiverse.networkfaults.spi.ConsequenceCleaner;
+import io.quarkiverse.networkfaults.spi.EventLoopWatcher;
+import io.quarkiverse.networkfaults.spi.PoolResolver;
+import io.quarkiverse.networkfaults.spi.ResourceTarget;
 import io.quarkiverse.networkfaults.spi.TargetBean;
 import io.quarkiverse.networkfaults.spi.TargetName;
 import io.quarkiverse.networkfaults.spi.TargetRequests;
@@ -36,11 +39,18 @@ public final class NetworkFaultsImpl implements NetworkFaults {
 
     private final boolean enabled;
     private final List<BeanTargetResolver> resolvers;
+    private final List<PoolResolver> pools;
+    private final List<EventLoopWatcher> eventLoopWatchers;
     private final FaultTracker tracker;
+    // the open event-loop watch: not a fault, so apart from the tracker, which cleans up after faults
+    private final AtomicReference<ActiveFault> eventLoopWatch = new AtomicReference<>();
 
-    public NetworkFaultsImpl(boolean enabled, List<BeanTargetResolver> resolvers, List<ConsequenceCleaner> cleaners) {
+    public NetworkFaultsImpl(boolean enabled, List<BeanTargetResolver> resolvers, List<ConsequenceCleaner> cleaners,
+            List<PoolResolver> pools, List<EventLoopWatcher> eventLoopWatchers) {
         this.enabled = enabled;
         this.resolvers = resolvers;
+        this.pools = pools;
+        this.eventLoopWatchers = eventLoopWatchers;
         this.tracker = new FaultTracker(cleaners);
     }
 
@@ -53,17 +63,20 @@ public final class NetworkFaultsImpl implements NetworkFaults {
 
     private void requireEnabled() {
         if (!enabled) {
-            if (LaunchMode.current().isDev()) {
-                throw new IllegalStateException("Network fault injection is not enabled. Ensure that "
-                        + ENABLED_PROPERTY
-                        + "=true is set.");
-            } else {
-                throw new IllegalStateException("Network fault injection is not enabled for this test. Annotate the test "
-                        + "class with @TestProfile(NetworkFaultsProfile.class), or set "
-                        + ENABLED_PROPERTY
-                        + "=true in your own test profile.");
-            }
+            throw notEnabled();
         }
+    }
+
+    private RuntimeException notEnabled() {
+        if (LaunchMode.current().isDev()) {
+            return new IllegalStateException("Network fault injection is not enabled. Ensure that "
+                    + ENABLED_PROPERTY
+                    + "=true is set.");
+        }
+        return new IllegalStateException("Network fault injection is not enabled for this test. Annotate the test "
+                + "class with @TestProfile(NetworkFaultsProfile.class), or set "
+                + ENABLED_PROPERTY
+                + "=true in your own test profile.");
     }
 
     private ProxyRegistry registry() {
@@ -78,12 +91,16 @@ public final class NetworkFaultsImpl implements NetworkFaults {
         return enabled && NetworkFaultsRuntime.isStarted() ? NetworkFaultsRuntime.registry().targets() : List.of();
     }
 
+    private RuntimeException noProxiedConnection(String name) {
+        return new IllegalArgumentException("No proxied connection found for '" + name + "'. Known targets: "
+                + targetNames() + ". Targets appear once their configuration has been read by the application; "
+                + "check that the dependency is configured and that the test class uses "
+                + "@TestProfile(NetworkFaultsProfile.class).");
+    }
+
     private ObservableTarget tracked(String name, List<ProxyTarget> members) {
         if (members.isEmpty()) {
-            throw new IllegalArgumentException("No proxied connection found for '" + name + "'. Known targets: "
-                    + targetNames() + ". Targets appear once their configuration has been read by the application; "
-                    + "check that the dependency is configured and that the test class uses "
-                    + "@TestProfile(NetworkFaultsProfile.class).");
+            throw noProxiedConnection(name);
         }
         // a single member answers to its own name, whatever selector found it
         return new CompositeTarget(members.size() == 1 ? members.getFirst().name() : name, members, tracker);
@@ -91,15 +108,12 @@ public final class NetworkFaultsImpl implements NetworkFaults {
 
     @Override
     public ObservableTarget target(Class<?> type, Annotation... qualifiers) {
-        // a caller-built varargs array may repeat a qualifier; collect it into a set that tolerates duplicates
-        // rather than letting Set.of throw a bare "duplicate element"
-        return target(new TargetBean(Set.of(type), new LinkedHashSet<>(Arrays.asList(qualifiers))));
+        return target(TargetBean.of(type, qualifiers));
     }
 
     @Override
     public ObservableTarget target(Instance<?> instance) {
-        Bean<?> bean = instance.getHandle().getBean();
-        return target(new TargetBean(bean.getTypes(), bean.getQualifiers()));
+        return target(TargetBean.of(instance));
     }
 
     @Override
@@ -151,17 +165,83 @@ public final class NetworkFaultsImpl implements NetworkFaults {
     private ObservableTarget target(TargetBean bean) {
         // which resolvers exist says nothing while fault injection is off: some are only built when it is on
         requireEnabled();
+        TargetName name = nameOf(bean);
+        if (name == null) {
+            throw noResolver(bean);
+        }
+        return target(name);
+    }
+
+    @Override
+    public Exhaustible pool(Class<?> type, Annotation... qualifiers) {
+        return pool(TargetBean.of(type, qualifiers));
+    }
+
+    @Override
+    public Exhaustible pool(Instance<?> instance) {
+        return pool(TargetBean.of(instance));
+    }
+
+    private Exhaustible pool(TargetBean bean) {
+        TargetName name = nameOf(bean);
+        ResourceTarget resource = name == null ? null : poolOf(name);
+        if (resource == null) {
+            throw new IllegalArgumentException(bean + " has no pool to exhaust. Supported are the DataSource beans of "
+                    + "Agroal and the Pool beans of the reactive SQL clients, with their datasource qualifier, and "
+                    + "workerPool() for the worker pool.");
+        }
+        return new Pool(name.toString(), resource);
+    }
+
+    /**
+     * A pool as handed to tests, tracked under the name of the target it belongs to.
+     */
+    private final class Pool implements Exhaustible {
+        private final String name;
+        private final ResourceTarget resource;
+
+        private Pool(String name, ResourceTarget resource) {
+            this.name = name;
+            this.resource = resource;
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public ActiveFault exhausted() {
+            return tracker.trackExhaustion(name, resource);
+        }
+    }
+
+    private TargetName nameOf(TargetBean bean) {
         for (BeanTargetResolver resolver : resolvers) {
             TargetName name = resolver.resolve(bean).orElse(null);
             if (name != null) {
-                return target(name);
+                return name;
             }
         }
+        return null;
+    }
+
+    private ResourceTarget poolOf(TargetName name) {
+        for (PoolResolver pool : pools) {
+            ResourceTarget resource = pool.resolve(name).orElse(null);
+            if (resource != null) {
+                return resource;
+            }
+        }
+        return null;
+    }
+
+    private RuntimeException noResolver(TargetBean bean) {
         List<String> present = new ArrayList<>();
         for (BeanTargetResolver resolver : resolvers) {
             present.add(resolver.getClass().getName());
         }
-        throw new IllegalArgumentException("No extension recognises " + bean + " as a proxied connection (resolvers "
+        return new IllegalArgumentException("No extension recognises " + bean + " as a proxied connection (resolvers "
                 + "present: " + present + "). Known targets: " + targetNames());
     }
 
@@ -181,6 +261,63 @@ public final class NetworkFaultsImpl implements NetworkFaults {
             }
         }
         return tracked(selector.toString(), new ArrayList<>(members.values()));
+    }
+
+    @Override
+    public Exhaustible workerPool() {
+        return new Pool(WorkerPool.NAME, new WorkerPool());
+    }
+
+    @Override
+    public EventLoops eventLoops() {
+        if (eventLoopWatchers.isEmpty()) {
+            throw new IllegalStateException("The event loops cannot be watched: the application has no Vert.x");
+        }
+        return () -> {
+            // before the watcher is asked: starting a second watch would replace the first one's handler
+            if (eventLoopWatch.get() != null) {
+                throw alreadyWatched();
+            }
+            EventLoopWatch watch = new EventLoopWatch(eventLoopWatchers.getFirst().watch());
+            if (!eventLoopWatch.compareAndSet(null, watch)) {
+                watch.stopWatching();
+                throw alreadyWatched();
+            }
+            return watch;
+        };
+    }
+
+    private static IllegalStateException alreadyWatched() {
+        return new IllegalStateException("The event loops are already watched; end that watch before starting"
+                + " another");
+    }
+
+    /**
+     * Ending the watch stops the watcher and fails if an event loop was blocked meanwhile.
+     */
+    private final class EventLoopWatch implements ActiveFault {
+
+        private final EventLoopWatcher.Watch watch;
+
+        EventLoopWatch(EventLoopWatcher.Watch watch) {
+            this.watch = watch;
+        }
+
+        void stopWatching() {
+            watch.stop();
+        }
+
+        @Override
+        public void end() {
+            if (!eventLoopWatch.compareAndSet(this, null)) {
+                return;
+            }
+            List<String> blocked = watch.stop();
+            if (!blocked.isEmpty()) {
+                throw new AssertionError("An event loop was blocked while watched:\n  "
+                        + String.join("\n  ", blocked));
+            }
+        }
     }
 
     @Override
@@ -207,7 +344,13 @@ public final class NetworkFaultsImpl implements NetworkFaults {
 
     @Override
     public void resetAll() {
-        tracker.endAll();
+        List<ActiveFault> ends = new ArrayList<>();
+        ends.add(tracker::endAll);
+        ActiveFault watch = eventLoopWatch.get();
+        if (watch != null) {
+            ends.add(watch);
+        }
+        FaultTracker.endEach(ends);
     }
 
     /**

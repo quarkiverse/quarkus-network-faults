@@ -36,10 +36,30 @@ public class NetworkFaultsAfterEachCallback implements QuarkusTestAfterEachCallb
         }
         // the extension's own synthetic bean, the only implementation there is
         NetworkFaultsImpl faults = (NetworkFaultsImpl) handle.get();
-        faults.resetAll();
-        List<String> violations = faults.takeGuardViolations();
-        if (!violations.isEmpty()) {
-            throw new AssertionError("Network fault had no effect:\n  " + String.join("\n  ", violations));
+        verify(faults);
+    }
+
+    /**
+     * Resets the faults, then takes the guard's verdicts whether or not that failed, so none carries into the next
+     * test. A failed reset is thrown with the guard's failure attached as suppressed.
+     */
+    static void verify(NetworkFaultsImpl faults) {
+        Throwable failure = null;
+        try {
+            faults.resetAll();
+        } catch (Throwable e) {
+            failure = e;
+            throw e;
+        } finally {
+            List<String> violations = faults.takeGuardViolations();
+            if (!violations.isEmpty()) {
+                AssertionError guardFailure = new AssertionError(
+                        "Fault had no effect:\n  " + String.join("\n  ", violations));
+                if (failure == null) {
+                    throw guardFailure;
+                }
+                failure.addSuppressed(guardFailure);
+            }
         }
     }
 }

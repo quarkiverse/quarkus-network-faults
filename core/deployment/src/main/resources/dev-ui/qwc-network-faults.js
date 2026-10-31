@@ -231,7 +231,7 @@ export class QwcNetworkFaults extends LitElement {
     _verdict(last) {
         switch (last.verdict) {
             case 'not-judged':
-                return html`<span title="Refused and dropped connections never reach the proxy, so this fault cannot be judged by its traffic; what the application did is the evidence">not judged</span>`;
+                return html`<span title="The guard could not watch this fault: refused and dropped connections never reach the proxy, and the waiters of some pools cannot be observed; what the application did is the evidence">not judged</span>`;
             case 'saw-traffic':
                 return html`<span class="ok">saw ${last.connectionsSeen} connection(s), ${last.httpRequestsSeen} request(s)</span>`;
             default:

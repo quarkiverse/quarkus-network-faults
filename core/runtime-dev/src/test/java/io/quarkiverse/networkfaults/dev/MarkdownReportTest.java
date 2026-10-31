@@ -37,7 +37,7 @@ class MarkdownReportTest {
     void aFaultTheGuardCannotJudgeIsNotJudged() {
         String md = MarkdownReport.render(List.of(snapshot("rest-client:inventory", "quarkus.rest-client.inventory.url")),
                 List.of(entry("rest-client:inventory", "unavailable", "card", true, false)));
-        assertTrue(md.contains("not judged: refused and dropped connections never reach the proxy"), md);
+        assertTrue(md.contains("not judged: the guard could not watch this fault"), md);
         assertFalse(md.contains("saw traffic"), md);
     }
 
