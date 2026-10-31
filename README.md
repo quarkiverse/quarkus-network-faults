@@ -311,6 +311,12 @@ Read the [documentation](https://docs.quarkiverse.io/quarkus-network-faults/dev/
 the quick start, the guides, and the reference pages for faults, targets, the guard and the
 client timeout defaults these tests tend to surface.
 
+## Which project answers what
+
+This extension asks what one instance does when a dependency breaks or a resource fills up. What goes wrong only with
+more than one instance, such as a cache stale on the other replica or a job run by every replica, is a question for
+Quarkus Fleet Test, which runs the packaged application behind a load balancer.
+
 ## Requirements
 
 - Quarkus `4.0.0.Beta1` or later
