@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkiverse.resiliencytesting.Endpoint;
 import io.quarkiverse.resiliencytesting.Faults;
 import io.quarkiverse.resiliencytesting.Target;
 import io.quarkiverse.resiliencytesting.junit.NetworkFaultsProfile;
@@ -57,8 +58,9 @@ class ShippingFailuresTest {
 
     @Test
     void carrierSaysComeBackLater() {
-        Target shipping = faults.target(ShippingClient.class);
-        try (var ignored = shipping.http().forFirst(1)
+        // orders placed earlier are still being shipped in the background; only the quote's own requests count
+        Endpoint quotes = faults.target(ShippingClient.class).http().requests("GET", "/shipping/{orderId}/quote");
+        try (var ignored = quotes.http().forFirst(1)
                 .http().respondsWith(429).header("Retry-After", "2")) {
             when()
                     .get("/orders/1/shipping-quote")
@@ -66,7 +68,7 @@ class ShippingFailuresTest {
                     .statusCode(200);
         }
 
-        var attempts = shipping.traffic().httpRequests();
+        var attempts = quotes.traffic().httpRequests();
         var limited = attempts.get(attempts.size() - 2);
         var retried = attempts.get(attempts.size() - 1);
         assertEquals(429, limited.responseStatus());
