@@ -32,7 +32,7 @@ The model tests do not call a paid provider or verify its billing policy.
 
 == Prerequisites
 
-The test class uses the `NetworkFaultsProfile` test profile and injects `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+The test class uses the `NetworkFaultsProfile` test profile and injects `Faults`, as described in the xref:quickstart.adoc[Quick start].
 
 The support for Quarkus LangChain4j is added to the build automatically when `quarkus-langchain4j-core` is present, and that for MCP clients when `quarkus-langchain4j-mcp` is.
 The snippets belong inside test methods unless they declare an interface or show configuration.

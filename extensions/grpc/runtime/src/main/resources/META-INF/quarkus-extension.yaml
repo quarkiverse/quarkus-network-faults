@@ -1,5 +1,5 @@
-name: Network Faults - gRPC
-description: Network fault targets for gRPC clients; included automatically next to quarkus-network-faults when quarkus-grpc is present
+name: Resiliency Testing - gRPC
+description: Network fault targets for gRPC clients; included automatically next to quarkus-resiliency-testing when quarkus-grpc is present
 metadata:
   keywords:
     - testing

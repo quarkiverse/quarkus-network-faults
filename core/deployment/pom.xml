@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-core-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-core-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-deployment</artifactId>
-    <name>Quarkus Network Faults - Deployment</name>
+    <artifactId>quarkus-resiliency-testing-deployment</artifactId>
+    <name>Quarkus Resiliency Testing - Deployment</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.deployment</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.deployment</automatic.module.name>
     </properties>
 
     <dependencies>
@@ -28,18 +28,18 @@
             <artifactId>quarkus-devjsonrpc-deployment-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment-spi</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-dev</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-dev</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -59,7 +59,7 @@
                     <include>test-writing-guide.md</include>
                     <include>agent-playbook.md</include>
                 </includes>
-                <targetPath>network-faults</targetPath>
+                <targetPath>resiliency-testing</targetPath>
             </resource>
         </resources>
         <plugins>

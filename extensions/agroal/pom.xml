@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-extensions-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-extensions-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-agroal-parent</artifactId>
-    <name>Quarkus Network Faults - Agroal - Parent</name>
+    <artifactId>quarkus-resiliency-testing-agroal-parent</artifactId>
+    <name>Quarkus Resiliency Testing - Agroal - Parent</name>
     <packaging>pom</packaging>
 
     <modules>

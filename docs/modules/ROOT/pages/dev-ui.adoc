@@ -3,10 +3,10 @@
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
 
-In dev mode, the _Network faults_ card lists every target and applies and ends faults on the running application.
+In dev mode, the _Resiliency Testing_ card lists every target and applies and ends faults on the running application.
 Each target also shows what its last fault did, and the session can be exported as a Markdown report.
 
-image::dev-ui-card.png[alt="The Network faults page: a row per target with its property, proxy and upstream, active fault, connections and bytes, and under it the fault form, here responds-with:503 with a body and a content type, and the requests the target sent",width=900,align=center]
+image::dev-ui-card.png[alt="The Resiliency Testing page: a row per target with its property, proxy and upstream, active fault, connections and bytes, and under it the fault form, here responds-with:503 with a body and a content type, and the requests the target sent",width=900,align=center]
 
 == Enabling It
 
@@ -14,7 +14,7 @@ Fault injection is build-time configuration, so the card needs the flag in the d
 
 [source,properties]
 ----
-%dev.quarkus.network-faults.enabled=true
+%dev.quarkus.resiliency-testing.enabled=true
 ----
 
 Without it the card says so and shows nothing else.
@@ -94,7 +94,7 @@ Behind the column is a history of every fault applied since the application star
 == Report
 
 *Export report* in the toolbar renders a Markdown report: the targets with their property, upstream and active fault, every fault of the history with whether traffic went through it, and the counters of each target.
-*Copy* puts it on the clipboard and *Download* saves it as `network-faults-report.md`, to paste into an issue, a pull request or an agent conversation.
+*Copy* puts it on the clipboard and *Download* saves it as `resiliency-testing-report.md`, to paste into an issue, a pull request or an agent conversation.
 
 == Driving the Card from an Agent
 

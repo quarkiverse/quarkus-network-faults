@@ -7,11 +7,11 @@
         <artifactId>quarkiverse-parent</artifactId>
         <version>25</version>
     </parent>
-    <groupId>io.quarkiverse.networkfaults</groupId>
-    <artifactId>quarkus-network-faults-parent</artifactId>
+    <groupId>io.quarkiverse.resiliencytesting</groupId>
+    <artifactId>quarkus-resiliency-testing-parent</artifactId>
     <version>999-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Quarkus Network Faults - Parent</name>
+    <name>Quarkus Resiliency Testing - Parent</name>
 
     <modules>
         <module>core</module>
@@ -22,9 +22,9 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:quarkiverse/quarkus-network-faults.git</connection>
-        <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-network-faults.git</developerConnection>
-        <url>https://github.com/quarkiverse/quarkus-network-faults</url>
+        <connection>scm:git:git@github.com:quarkiverse/quarkus-resiliency-testing.git</connection>
+        <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-resiliency-testing.git</developerConnection>
+        <url>https://github.com/quarkiverse/quarkus-resiliency-testing</url>
       <tag>HEAD</tag>
   </scm>
 

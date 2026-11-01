@@ -1,9 +1,9 @@
-// Inject custom CSS for styling the Quarkus Network Faults documentation
+// Inject custom CSS for styling the Quarkus Resiliency Testing documentation
 ++++
 <script>
 const link = document.createElement('link');
 link.rel = 'stylesheet';
-link.href = './_images/quarkus-network-faults-style.css';
+link.href = './_images/quarkus-resiliency-testing-style.css';
 document.head.appendChild(link);
 </script>
 ++++

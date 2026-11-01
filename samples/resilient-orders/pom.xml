@@ -3,17 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.acme</groupId>
-    <artifactId>network-faults-resilient-orders</artifactId>
+    <artifactId>resiliency-testing-resilient-orders</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>Quarkus Network Faults - Resilient orders</name>
-    <description>The application and the tests of the "Introducing Quarkus Network Faults" blog post</description>
+    <name>Quarkus Resiliency Testing - Resilient orders</name>
+    <description>The application and the tests of the "Introducing Quarkus Resiliency Testing" blog post</description>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.version>4.0.0.Beta1</quarkus.version>
-        <network-faults.version>999-SNAPSHOT</network-faults.version>
+        <resiliency-testing.version>999-SNAPSHOT</resiliency-testing.version>
         <quarkus-langchain4j.version>2.0.0.Beta1</quarkus-langchain4j.version>
         <compiler-plugin.version>3.16.0</compiler-plugin.version>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
@@ -66,9 +66,9 @@
             <version>${quarkus-langchain4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-junit</artifactId>
-            <version>${network-faults.version}</version>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-junit</artifactId>
+            <version>${resiliency-testing.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

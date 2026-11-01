@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 
-import io.quarkiverse.networkfaults.ActiveFault;
-import io.quarkiverse.networkfaults.Moment;
-import io.quarkiverse.networkfaults.NetworkFaults;
-import io.quarkiverse.networkfaults.junit.NetworkFaultsProfile;
+import io.quarkiverse.resiliencytesting.ActiveFault;
+import io.quarkiverse.resiliencytesting.Moment;
+import io.quarkiverse.resiliencytesting.Faults;
+import io.quarkiverse.resiliencytesting.junit.NetworkFaultsProfile;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
@@ -25,7 +25,7 @@ import io.quarkus.test.junit.TestProfile;
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void inventoryHangsSoTheTimeoutFallbackAnswers() {

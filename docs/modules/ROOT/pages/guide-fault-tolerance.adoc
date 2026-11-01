@@ -1,4 +1,4 @@
-= Using Network Faults with SmallRye Fault Tolerance
+= Using Resiliency Testing with SmallRye Fault Tolerance
 
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
@@ -14,7 +14,7 @@ This guide shows how to:
 
 == Prerequisites
 
-The test class uses the `NetworkFaultsProfile` test profile and injects `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+The test class uses the `NetworkFaultsProfile` test profile and injects `Faults`, as described in the xref:quickstart.adoc[Quick start].
 The sample's `POST /orders/retrying` endpoint calls `InventoryService.reserveWithRetry`:
 
 [source,java]

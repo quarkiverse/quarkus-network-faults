@@ -1,7 +1,7 @@
-# Quarkus Network Faults
+# Quarkus Resiliency Testing
 
-[![Version](https://img.shields.io/maven-central/v/io.quarkiverse.networkfaults/quarkus-network-faults?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.networkfaults/quarkus-network-faults)
-[![Documentation](https://img.shields.io/badge/docs-quarkiverse-4695EB?logo=quarkus&style=flat-square)](https://docs.quarkiverse.io/quarkus-network-faults/dev/index.html)
+[![Version](https://img.shields.io/maven-central/v/io.quarkiverse.resiliencytesting/quarkus-resiliency-testing?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.resiliencytesting/quarkus-resiliency-testing)
+[![Documentation](https://img.shields.io/badge/docs-quarkiverse-4695EB?logo=quarkus&style=flat-square)](https://docs.quarkiverse.io/quarkus-resiliency-testing/dev/index.html)
 [![Quarkus](https://img.shields.io/badge/Quarkus-4.0.0.Beta1%2B-4695EB?logo=quarkus&style=flat-square)](https://quarkus.io/)
 
 **Make a dependency fail on purpose, inside your `@QuarkusTest`.**
@@ -20,7 +20,7 @@ resilience of a service is tested where it lives, in its own test suite.
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void inventoryServiceHangs() {
@@ -50,9 +50,9 @@ One test dependency brings everything in:
 
 ```xml
 <dependency>
-    <groupId>io.quarkiverse.networkfaults</groupId>
-    <artifactId>quarkus-network-faults-junit</artifactId>
-    <version>${quarkus-network-faults.version}</version>
+    <groupId>io.quarkiverse.resiliencytesting</groupId>
+    <artifactId>quarkus-resiliency-testing-junit</artifactId>
+    <version>${quarkus-resiliency-testing.version}</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -106,7 +106,7 @@ configuration property to look at. A fault test cannot pass by accident.
 
 ### Sixteen classic problems, one test each
 
-The application behind the [Introducing Quarkus Network Faults](https://quarkus.io/blog/quarkus-network-faults/)
+The application behind the [Introducing Quarkus Resiliency Testing](https://quarkus.io/blog/quarkus-resiliency-testing/)
 blog post is `samples/resilient-orders`: one order service, and sixteen tests that each pin one
 protection against a dependency that hangs, fails, rate-limits or answers late, a payment whose
 response is lost, a database that hangs, restarts or dies mid-transaction, Kafka, Redis and an LLM
@@ -162,10 +162,10 @@ Eight more samples under `samples/` each reproduce an overload incident, in the 
 
 ## See it before you test it
 
-In dev mode the **Network faults** card in the Dev UI lists every target of the running
+In dev mode the **Resiliency Testing** card in the Dev UI lists every target of the running
 application and lets you break them by hand.
 
-![The Network faults Dev UI card applying a fault, the Requests view of a target and the exported report](docs/modules/ROOT/assets/images/dev-ui-demo.gif)
+![The Resiliency Testing Dev UI card applying a fault, the Requests view of a target and the exported report](docs/modules/ROOT/assets/images/dev-ui-demo.gif)
 
 - **Every fault, on any target**, or only on the requests a `POST /path` scope selects. A
   `responds-with:503` can carry a body and a content type.
@@ -192,7 +192,7 @@ running application, with descriptions written for an agent. Point your agent at
 `http://localhost:8080/q/dev-mcp`; with Claude Code:
 
 ```bash
-claude mcp add --transport http network-faults http://localhost:8080/q/dev-mcp
+claude mcp add --transport http resiliency-testing http://localhost:8080/q/dev-mcp
 ```
 
 Three resources come with the tools:
@@ -208,14 +208,14 @@ Three resources come with the tools:
 
 A prompt that uses all three:
 
-> Read the quarkus-network-faults test-writing guide and the inventory, then write the
+> Read the quarkus-resiliency-testing test-writing guide and the inventory, then write the
 > `@QuarkusTest`s that verify what `/orders` does when the inventory service hangs, fails, or
 > dies mid-response. Run the experiments first if you are unsure what to assert.
 
 The tools that apply faults are opt-in, enabled from the Dev UI, so an agent cannot break a
 running application until you say so. The extension generates no test code: the agent writes
 it, from what it read and what it observed. See
-[AI Agents](https://docs.quarkiverse.io/quarkus-network-faults/dev/agents.html).
+[AI Agents](https://docs.quarkiverse.io/quarkus-resiliency-testing/dev/agents.html).
 
 ## Why it works
 
@@ -236,7 +236,7 @@ a test can prove.
 
 | | Where the fault happens | What it can produce | Writing a test | When a test is wrong | Dev UI and agents |
 |---|---|---|---|---|---|
-| **Quarkus Network Faults** | On the wire, in a proxy inside the test JVM, between the real client library and the real dependency | Refused and dropped connections, hangs, latency, resets and clean closes at a chosen moment of the response, synthetic HTTP statuses, on all or some requests; the client's timeouts, retries and breakers react as in production | **You write the test, nothing else.** One test dependency; URLs are rewritten to the proxies for you; the dependency is the bean you inject; a fault is one statement in a try-with-resources; deterministic with `forFirst`, `every`, `after`; faults ended, pools flushed and breakers reset after each test | **The test tells you.** A fault no request went through fails the test and names the configuration property to check; a second fault on a busy target, or an HTTP fault on a datasource, is refused with a message saying what to do instead | A card that applies every fault, shows each target's requests and the verdict on its last fault, and exports a report; Dev MCP tools, a test-writing guide, a playbook and an inventory of the guarded methods, so an agent can experiment and then write the tests |
+| **Quarkus Resiliency Testing** | On the wire, in a proxy inside the test JVM, between the real client library and the real dependency | Refused and dropped connections, hangs, latency, resets and clean closes at a chosen moment of the response, synthetic HTTP statuses, on all or some requests; the client's timeouts, retries and breakers react as in production | **You write the test, nothing else.** One test dependency; URLs are rewritten to the proxies for you; the dependency is the bean you inject; a fault is one statement in a try-with-resources; deterministic with `forFirst`, `every`, `after`; faults ended, pools flushed and breakers reset after each test | **The test tells you.** A fault no request went through fails the test and names the configuration property to check; a second fault on a busy target, or an HTTP fault on a datasource, is refused with a message saying what to do instead | A card that applies every fault, shows each target's requests and the verdict on its last fault, and exports a report; Dev MCP tools, a test-writing guide, a playbook and an inventory of the guarded methods, so an agent can experiment and then write the tests |
 | [Quarkus Goblin](https://github.com/quarkiverse/quarkus-goblin) | Inside the application, in JAX-RS filters, CDI interceptors and an Agroal hook | Latency, exceptions and HTTP statuses thrown from Java code on the application's own endpoints, beans and connection acquisition; rewritten response bodies and headers | **Made for clicking, not for tests.** Chaos is switched on through configuration or `AssaultEngine.setActive(true)` and acts globally, by package, annotation and a percentage of requests, so deterministic at 100 percent only | **Silence.** An assault that never fired leaves the test green; the history shows it, the test does not | The richest dashboard of the four: profiles, history, a Markdown report, metrics and traces; Dev MCP tools, a playbook and an inventory for an agent that runs experiments, with no test API to write them down in |
 | [Toxiproxy](https://github.com/Shopify/toxiproxy) via [Testcontainers](https://java.testcontainers.org/modules/toxiproxy/) | On the wire, in a container between the application and a dependency that is also reachable from that container | Latency, bandwidth, slow close, timeout, reset and data limits on a TCP stream, for any language | **The plumbing is yours.** Docker on every machine and runner; a test resource that starts a network, the dependency on it and the proxy container; a client for the API; the application's client reconfigured to a mapped port; a toxic created and removed around each test; no per-request selection | **Silence.** A toxic on a proxy nothing talks to is invisible, and a pooled connection opened before it keeps working | A CLI and an HTTP API against the container; nothing in the Quarkus Dev UI, nothing for an agent |
 | [WireMock](https://wiremock.org/) | In place of the dependency: a stub server answers instead of it | Scripted HTTP responses, delays, connection resets and malformed bodies | **A stub per call.** A stub server from a test resource or the `quarkus-wiremock` Dev Service, the client reconfigured to its URL, and a stub for every request the test makes, so the real dependency is never exercised | **If you ask.** An unstubbed request gets a 404, and `verify(...)` checks a call was made, when the test includes it | An admin API, and a Dev Service that starts the server; nothing for an agent |
@@ -315,7 +315,7 @@ chunks or after n Server-Sent Events. `http().forFirst(n)`, `every(n)` and `afte
 some of the requests, and `traffic()` counts and lists what went through, so a test can check
 that every retry carried the same idempotency key.
 
-Read the [documentation](https://docs.quarkiverse.io/quarkus-network-faults/dev/index.html) for
+Read the [documentation](https://docs.quarkiverse.io/quarkus-resiliency-testing/dev/index.html) for
 the quick start, the guides, and the reference pages for faults, targets, the guard and the
 client timeout defaults these tests tend to surface.
 

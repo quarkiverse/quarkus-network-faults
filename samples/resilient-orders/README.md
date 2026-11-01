@@ -1,7 +1,7 @@
 # Resilient orders
 
 The application and the tests of the
-[Introducing Quarkus Network Faults](https://quarkus.io/blog/quarkus-network-faults/) blog post:
+[Introducing Quarkus Resiliency Testing](https://quarkus.io/blog/quarkus-resiliency-testing/) blog post:
 classic problems of distributed systems, one test each. It needs Docker for the PostgreSQL, Kafka
 and Redis Dev Services, and the extension installed in the local Maven repository (`./mvnw install`
 at the root of this repository).
@@ -12,7 +12,7 @@ every order through a carrier, which also gives shipping quotes. Orders are paid
 service, prices are cached in Redis, and a Quarkus LangChain4j AI service summarizes text with an
 OpenAI model. The inventory, payment and shipping services are served by the application itself
 (`InventoryStub`, `PaymentStub`, `ShippingStub`), so nothing else has to run, but the REST Clients
-reach them through the Network faults proxy exactly as they would reach real services. In tests,
+reach them through the Resiliency Testing proxy exactly as they would reach real services. In tests,
 `LlmStub` stands in for the OpenAI API, and the Kafka companion of Quarkus' test tooling reads the
 dead-letter topic.
 

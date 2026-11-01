@@ -30,7 +30,7 @@ A separate example tests a pool that cannot open new connections.
 
 == Prerequisites
 
-Use the `NetworkFaultsProfile` test profile and inject `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+Use the `NetworkFaultsProfile` test profile and inject `Faults`, as described in the xref:quickstart.adoc[Quick start].
 
 The sample application provides these endpoints:
 

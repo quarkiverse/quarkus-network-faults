@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-extension-tests</artifactId>
-    <name>Quarkus Network Faults - Extension Tests</name>
+    <artifactId>quarkus-resiliency-testing-extension-tests</artifactId>
+    <name>Quarkus Resiliency Testing - Extension Tests</name>
     <description>Tests that boot a Quarkus application against the extension itself, kept apart so that they build after every module they resolve</description>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.tests</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.tests</automatic.module.name>
     </properties>
 
     <!-- Starting an application resolves every conditional dependency the core declares, which is every extension
@@ -21,8 +21,8 @@
          class path they would pull their Quarkus extensions into every test application. -->
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

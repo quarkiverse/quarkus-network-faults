@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-extensions-parent</artifactId>
-    <name>Quarkus Network Faults - Extensions - Parent</name>
+    <artifactId>quarkus-resiliency-testing-extensions-parent</artifactId>
+    <name>Quarkus Resiliency Testing - Extensions - Parent</name>
     <packaging>pom</packaging>
 
     <modules>
@@ -52,7 +52,7 @@
                         </execution>
                     </executions>
                 </plugin>
-                <!-- a runtime module declares this plugin and sets network-faults.requires to the Quarkus extension
+                <!-- a runtime module declares this plugin and sets resiliency-testing.requires to the Quarkus extension
                      whose presence brings it into a build -->
                 <plugin>
                     <groupId>io.quarkus</groupId>
@@ -67,7 +67,7 @@
                             <configuration>
                                 <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
                                 <dependencyCondition>
-                                    <artifact>${network-faults.requires}</artifact>
+                                    <artifact>${resiliency-testing.requires}</artifact>
                                 </dependencyCondition>
                             </configuration>
                         </execution>

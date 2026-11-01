@@ -1,5 +1,5 @@
-name: Network Faults - REST Client
-description: Network fault targets for REST Client, included automatically when both quarkus-network-faults and the REST Client extension are present
+name: Resiliency Testing - REST Client
+description: Network fault targets for REST Client, included automatically when both quarkus-resiliency-testing and the REST Client extension are present
 metadata:
   keywords:
     - testing

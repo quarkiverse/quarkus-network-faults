@@ -1,5 +1,5 @@
-name: Network Faults - MongoDB
-description: Network fault targets for the MongoDB client; included automatically next to quarkus-network-faults when quarkus-mongodb-client is present
+name: Resiliency Testing - MongoDB
+description: Network fault targets for the MongoDB client; included automatically next to quarkus-resiliency-testing when quarkus-mongodb-client is present
 metadata:
   keywords:
     - testing

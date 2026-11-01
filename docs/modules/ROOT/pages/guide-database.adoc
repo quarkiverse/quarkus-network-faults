@@ -15,7 +15,7 @@ This guide shows how to test a request when:
 
 == Prerequisites
 
-The test class uses the `NetworkFaultsProfile` test profile and injects `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+The test class uses the `NetworkFaultsProfile` test profile and injects `Faults`, as described in the xref:quickstart.adoc[Quick start].
 
 The samples address the default JDBC datasource, `faults.target(DataSource.class)`.
 A named datasource takes its qualifier, a reactive pool is `faults.target(Pool.class)`, and an `EntityManager` or a repository resolves to the datasource behind it; see xref:targets.adoc[Targets].

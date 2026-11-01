@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-samples-parent</artifactId>
-    <name>Quarkus Network Faults - Samples - Parent</name>
+    <artifactId>quarkus-resiliency-testing-samples-parent</artifactId>
+    <name>Quarkus Resiliency Testing - Samples - Parent</name>
     <packaging>pom</packaging>
 
     <modules>
@@ -28,8 +28,8 @@
     <dependencies>
         <!-- the extension is a test-only dependency, as it would be in a real application -->
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-junit</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-junit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

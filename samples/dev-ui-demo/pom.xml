@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.acme</groupId>
-    <artifactId>network-faults-dev-ui-demo</artifactId>
+    <artifactId>resiliency-testing-dev-ui-demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>Quarkus Network Faults - Dev UI demo</name>
-    <description>A small orders service to try the Network faults Dev UI card and the Dev MCP tools by hand</description>
+    <name>Quarkus Resiliency Testing - Dev UI demo</name>
+    <description>A small orders service to try the Resiliency Testing Dev UI card and the Dev MCP tools by hand</description>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.version>4.0.0.Beta1</quarkus.version>
-        <network-faults.version>999-SNAPSHOT</network-faults.version>
+        <resiliency-testing.version>999-SNAPSHOT</resiliency-testing.version>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
     </properties>
 
@@ -49,18 +49,18 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
         </dependency>
-        <!-- The extension itself, so that dev mode has the Network faults card and the Dev MCP tools.
+        <!-- The extension itself, so that dev mode has the Resiliency Testing card and the Dev MCP tools.
              Nothing in it is active in a production build. A real application would usually add only the
              test-scoped junit module below, which brings the extension in for tests. -->
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults</artifactId>
-            <version>${network-faults.version}</version>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing</artifactId>
+            <version>${resiliency-testing.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-junit</artifactId>
-            <version>${network-faults.version}</version>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-junit</artifactId>
+            <version>${resiliency-testing.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-samples-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-samples-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-samples-liveness-hits-database</artifactId>
-    <name>Quarkus Network Faults - Samples - Liveness Hits Database</name>
+    <artifactId>quarkus-resiliency-testing-samples-liveness-hits-database</artifactId>
+    <name>Quarkus Resiliency Testing - Samples - Liveness Hits Database</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.samples.livenesshitsdatabase</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.samples.livenesshitsdatabase</automatic.module.name>
     </properties>
 
     <dependencies>

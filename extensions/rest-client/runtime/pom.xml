@@ -3,24 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-rest-client-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-rest-client-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-rest-client</artifactId>
-    <name>Quarkus Network Faults - REST Client - Runtime</name>
-    <description>Network fault targets for REST Client; included automatically next to quarkus-network-faults when quarkus-rest-client is present</description>
+    <artifactId>quarkus-resiliency-testing-rest-client</artifactId>
+    <name>Quarkus Resiliency Testing - REST Client - Runtime</name>
+    <description>Network fault targets for REST Client; included automatically next to quarkus-resiliency-testing when quarkus-rest-client is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-rest-client</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.restclient</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-rest-client</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.restclient</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

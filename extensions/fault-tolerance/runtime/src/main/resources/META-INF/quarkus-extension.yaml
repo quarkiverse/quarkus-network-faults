@@ -1,5 +1,5 @@
-name: Network Faults - Fault Tolerance
-description: Resets circuit breakers when a network fault ends; included automatically when both quarkus-network-faults and the Fault Tolerance extension are present
+name: Resiliency Testing - Fault Tolerance
+description: Resets circuit breakers when a network fault ends; included automatically when both quarkus-resiliency-testing and the Fault Tolerance extension are present
 metadata:
   keywords:
     - testing

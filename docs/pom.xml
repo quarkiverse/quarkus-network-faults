@@ -3,22 +3,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-docs</artifactId>
-    <name>Quarkus Network Faults - Documentation</name>
+    <artifactId>quarkus-resiliency-testing-docs</artifactId>
+    <name>Quarkus Resiliency Testing - Documentation</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.docs</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.docs</automatic.module.name>
     </properties>
 
     <dependencies>
         <!-- Make sure the doc is built after the other artifacts -->
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

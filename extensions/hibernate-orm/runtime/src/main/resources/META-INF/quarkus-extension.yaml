@@ -1,5 +1,5 @@
-name: Network Faults - Hibernate ORM
-description: Network fault targets for Hibernate ORM and Hibernate Reactive persistence units, resolved to their datasource; included automatically next to quarkus-network-faults when quarkus-hibernate-orm is present
+name: Resiliency Testing - Hibernate ORM
+description: Network fault targets for Hibernate ORM and Hibernate Reactive persistence units, resolved to their datasource; included automatically next to quarkus-resiliency-testing when quarkus-hibernate-orm is present
 metadata:
   keywords:
     - testing

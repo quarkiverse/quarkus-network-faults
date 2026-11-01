@@ -3,22 +3,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-core-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-core-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults</artifactId>
-    <name>Quarkus Network Faults - Runtime</name>
+    <artifactId>quarkus-resiliency-testing</artifactId>
+    <name>Quarkus Resiliency Testing - Runtime</name>
     <description>Inject network faults into the outbound connections of a Quarkus application during tests</description>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -60,22 +60,22 @@
                                 <artifact>${project.groupId}:${project.artifactId}-dev:${project.version}</artifact>
                             </conditionalDevDependencies>
                             <conditionalDependencies>
-                                <artifact>${project.groupId}:quarkus-network-faults-agroal:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-reactive-datasource:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-rest-client:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-kafka-client:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-messaging-kafka:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-langchain4j:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-langchain4j-mcp:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-fault-tolerance:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-redis:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-graphql-client:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-grpc:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-data-hibernate:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-hibernate-orm:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-mongodb:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-mailer:${project.version}</artifact>
-                                <artifact>${project.groupId}:quarkus-network-faults-vertx:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-agroal:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-reactive-datasource:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-rest-client:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-kafka-client:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-messaging-kafka:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-langchain4j:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-langchain4j-mcp:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-fault-tolerance:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-redis:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-graphql-client:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-grpc:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-data-hibernate:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-hibernate-orm:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-mongodb:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-mailer:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-resiliency-testing-vertx:${project.version}</artifact>
                             </conditionalDependencies>
                         </configuration>
                     </execution>

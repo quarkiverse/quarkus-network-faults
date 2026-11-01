@@ -15,7 +15,7 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.NetworkFaults;
+import io.quarkiverse.resiliencytesting.Faults;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -28,7 +28,7 @@ import io.quarkus.test.junit.QuarkusTest;
 class RequestsWaitForeverTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @TestHTTPResource("/reports")
     URI reports;

@@ -77,7 +77,7 @@ Each `HttpRequestRecord` says when the request was sent, on which connection, th
 == The Shape of a Retry
 
 A retry policy has a shape: attempts are spaced out, the spacing varies, and every attempt carries the same idempotency key and the same body, or the dependency cannot tell a retry from a new request.
-`Attempts`, in the `quarkus-network-faults-junit` module, asserts the shape over the records of one call and never an exact duration, which does not survive a slow build machine:
+`Attempts`, in the `quarkus-resiliency-testing-junit` module, asserts the shape over the records of one call and never an exact duration, which does not survive a slow build machine:
 
 [source,java]
 ----

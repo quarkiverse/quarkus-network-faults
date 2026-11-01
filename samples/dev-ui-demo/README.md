@@ -1,12 +1,12 @@
-# Network faults Dev UI demo
+# Resiliency Testing Dev UI demo
 
-A small orders service to try the Network faults Dev UI card and the Dev MCP tools by hand. It needs
+A small orders service to try the Resiliency Testing Dev UI card and the Dev MCP tools by hand. It needs
 Docker for the PostgreSQL Dev Service, and the extension installed in the local Maven repository
 (`./mvnw install` at the root of this repository).
 
 The application takes orders. Placing one calls an inventory service through a REST Client and then
 inserts a row. The inventory service is served by the application itself, so nothing else has to
-run, but the REST Client reaches it through the Network faults proxy exactly as it would reach a
+run, but the REST Client reaches it through the Resiliency Testing proxy exactly as it would reach a
 real service. `InventoryService` carries the resilience policy under test: a `@Timeout` with a
 `@Fallback` and a `@CircuitBreaker` on `reserve`, a `@Retry` on `reserveWithRetry`.
 
@@ -18,7 +18,7 @@ From the root of the repository:
 ./mvnw -f samples/dev-ui-demo/pom.xml quarkus:dev
 ```
 
-Then open the Dev UI at <http://localhost:8080/q/dev-ui> and find the **Network faults** card. It
+Then open the Dev UI at <http://localhost:8080/q/dev-ui> and find the **Resiliency Testing** card. It
 lists two targets: `rest-client:inventory` and `datasource:<default>:jdbc`.
 
 ## Things to try in the card
@@ -53,7 +53,7 @@ The application enables the Dev MCP server at `http://localhost:8080/q/dev-mcp`.
 for example:
 
 ```bash
-claude mcp add --transport http network-faults http://localhost:8080/q/dev-mcp
+claude mcp add --transport http resiliency-testing http://localhost:8080/q/dev-mcp
 ```
 
 The read-only tools and `resetAll` are enabled by default. The tools that apply or end a fault,
@@ -63,7 +63,7 @@ the agent playbook, and the inventory of this application's guarded methods.
 
 Prompts that show what the tools are for:
 
-- "Read the quarkus-network-faults test-writing guide and the inventory, then write the
+- "Read the quarkus-resiliency-testing test-writing guide and the inventory, then write the
   `@QuarkusTest`s that verify what `/orders` does when the inventory service hangs, fails, or
   dies mid-response."
 - "Run the playbook against `rest-client:inventory`: form a hypothesis for each annotation on

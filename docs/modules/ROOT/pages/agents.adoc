@@ -23,8 +23,8 @@ The guide below is written for an agent with no other documentation, and covers 
 
 Hand it to the agent in one of two ways:
 
-* Point it at this page, or at the file itself, `docs/modules/ROOT/examples/test-writing-guide.md` in the https://github.com/quarkiverse/quarkus-network-faults[repository^]
-* In dev mode with Dev MCP enabled, the agent reads it as the resource `quarkus-network-faults_testWritingGuide`, and the `getStatus` tool tells it to
+* Point it at this page, or at the file itself, `docs/modules/ROOT/examples/test-writing-guide.md` in the https://github.com/quarkiverse/quarkus-resiliency-testing[repository^]
+* In dev mode with Dev MCP enabled, the agent reads it as the resource `quarkus-resiliency-testing_testWritingGuide`, and the `getStatus` tool tells it to
 
 [source,markdown]
 ----
@@ -39,7 +39,7 @@ Turn fault injection on in the dev profile, and enable Dev MCP:
 
 [source,properties]
 ----
-%dev.quarkus.network-faults.enabled=true
+%dev.quarkus.resiliency-testing.enabled=true
 quarkus.dev-mcp.enabled=true
 ----
 
@@ -48,7 +48,7 @@ Start dev mode and point the agent's MCP client at `http://localhost:8080/q/dev-
 === Tools
 
 The tools are the methods behind the xref:dev-ui.adoc[Dev UI card].
-Over Dev MCP their names carry the prefix `quarkus-network-faults_`.
+Over Dev MCP their names carry the prefix `quarkus-resiliency-testing_`.
 The tools that only read, and `resetAll`, which only ever ends faults, are enabled by default.
 The tools that change the running application are opt-in: enable them in the Dev UI, under Settings, Dev MCP tab, Tools.
 
@@ -107,13 +107,13 @@ The tools that change the running application are opt-in: enable them in the Dev
 |===
 |Resource |What it holds
 
-|`quarkus-network-faults_testWritingGuide`
+|`quarkus-resiliency-testing_testWritingGuide`
 |The <<writing-tests-with-an-agent,test-writing guide>>
 
-|`quarkus-network-faults_agentPlaybook`
+|`quarkus-resiliency-testing_agentPlaybook`
 |The <<the-playbook,playbook>>: how to run an experiment safely and turn it into a test
 
-|`quarkus-network-faults_inventory`
+|`quarkus-resiliency-testing_inventory`
 |Where the application believes it is protected: every method guarded by a Fault Tolerance annotation, its effective values, and the types its class injects that a test can pass to `target(...)`
 |===
 

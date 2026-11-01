@@ -1,5 +1,5 @@
 [.landing]
-= Quarkus Network Faults
+= Quarkus Resiliency Testing
 
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
@@ -7,7 +7,7 @@ include::./includes/customization.adoc[]
 [.lead]
 **Verify what your application does when a dependency is down, unreachable, slow, hung, or dies mid-call, from an ordinary `@QuarkusTest`.**
 
-The Quarkus Network Faults extension places an in-process proxy in front of every outbound connection the configuration of your application describes, and lets your tests apply faults to it.
+The Quarkus Resiliency Testing extension places an in-process proxy in front of every outbound connection the configuration of your application describes, and lets your tests apply faults to it.
 No Docker and no external tooling are involved: the proxy is a Vert.x server inside the test JVM, and a test addresses a dependency by the bean the application injects to reach it.
 
 image::fig-1-request.svg[alt="Where the proxy sits: the configured URL is rewritten by the interceptor to a loopback port, the REST Client connects to the ProxyTarget in the same JVM, the proxy relays to the real service, and the test applies faults to the target",width=700,align="center"]
@@ -19,7 +19,7 @@ image::fig-1-request.svg[alt="Where the proxy sits: the configured URL is rewrit
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void inventoryServiceHangs() {
@@ -40,7 +40,7 @@ class OrderResourceTest {
 }
 ----
 
-== Why Use Quarkus Network Faults?
+== Why Use Quarkus Resiliency Testing?
 
 Resilience is a property of each service's own code: its timeouts, its retries, its fallbacks.
 Those are tested best where they live, in the service's own test suite, against a dependency made to fail on purpose, rather than in an end-to-end environment where a failure is hard to produce and harder to attribute.
@@ -52,7 +52,7 @@ This extension makes the dependency fail on purpose, inside the test JVM.
 - **Consequences are undone**: when a fault ends, and after every test, Agroal pools are flushed and SmallRye Fault Tolerance circuit breakers are reset
 - **A guard against tests that test nothing**: a test whose fault no connection went through fails, and the message names the configuration property to look at
 - **Calls are counted**: every HTTP request is counted and listed, even the ones a fault never relayed, so retries and open circuit breakers can be asserted
-- **Dev UI**: with `quarkus.network-faults.enabled=true` in the dev profile, the xref:dev-ui.adoc[_Network faults_ card] lists every target, applies and ends faults, drops connections and shows the event log of the running application
+- **Dev UI**: with `quarkus.resiliency-testing.enabled=true` in the dev profile, the xref:dev-ui.adoc[_Resiliency Testing_ card] lists every target, applies and ends faults, drops connections and shows the event log of the running application
 
 == What Can You Test?
 
@@ -115,7 +115,7 @@ It runs as a separate process, usually a container, in which a test creates prox
 
 That leaves the test in charge of everything around the fault: starting the proxy, routing each connection of the application through it, and cleaning up what a fault leaves behind in the application.
 
-The Quarkus Network Faults extension builds the proxy into the test run and takes care of that for you:
+The Quarkus Resiliency Testing extension builds the proxy into the test run and takes care of that for you:
 
 * Targets are discovered from the configuration of the application, Dev Services included
 * A test names a dependency by its bean, not by a proxy name or a port

@@ -3,29 +3,29 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-reactive-datasource-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-reactive-datasource-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-reactive-datasource</artifactId>
-    <name>Quarkus Network Faults - Reactive Datasource - Runtime</name>
-    <description>Network fault targets for Reactive Datasource; included automatically next to quarkus-network-faults when quarkus-reactive-datasource is present</description>
+    <artifactId>quarkus-resiliency-testing-reactive-datasource</artifactId>
+    <name>Quarkus Resiliency Testing - Reactive Datasource - Runtime</name>
+    <description>Network fault targets for Reactive Datasource; included automatically next to quarkus-resiliency-testing when quarkus-reactive-datasource is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-reactive-datasource</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.reactivedatasource</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-reactive-datasource</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.reactivedatasource</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-datasource-common</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-datasource-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -14,7 +14,7 @@ import io.smallrye.mutiny.Multi;
 
 /**
  * The inventory service this application depends on. Here it is served by {@link InventoryStub} in the same process;
- * the URL comes from {@code quarkus.rest-client.inventory.url}, which is the property the Network faults proxy takes
+ * the URL comes from {@code quarkus.rest-client.inventory.url}, which is the property the Resiliency Testing proxy takes
  * over, so every call below goes through the proxy and can be faulted.
  */
 @RegisterRestClient(configKey = "inventory")

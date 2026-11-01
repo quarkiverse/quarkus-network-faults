@@ -30,5 +30,5 @@
 .Development
 
 * xref:extending.adoc[Declaring Targets from Another Extension]
-* https://github.com/quarkiverse/quarkus-network-faults[Source Code^,role=github]
-* https://github.com/quarkiverse/quarkus-network-faults/issues[Issues^,role=github]
+* https://github.com/quarkiverse/quarkus-resiliency-testing[Source Code^,role=github]
+* https://github.com/quarkiverse/quarkus-resiliency-testing/issues[Issues^,role=github]

@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-fault-tolerance-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-fault-tolerance-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-fault-tolerance-deployment</artifactId>
-    <name>Quarkus Network Faults - Fault Tolerance - Deployment</name>
+    <artifactId>quarkus-resiliency-testing-fault-tolerance-deployment</artifactId>
+    <name>Quarkus Resiliency Testing - Fault Tolerance - Deployment</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.faulttolerance.deployment</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.faulttolerance.deployment</automatic.module.name>
     </properties>
 
     <dependencies>
@@ -20,8 +20,8 @@
             <artifactId>quarkus-arc-deployment</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-fault-tolerance</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-fault-tolerance</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

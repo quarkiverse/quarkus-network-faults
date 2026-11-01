@@ -1,30 +1,30 @@
-= Getting Started with Quarkus Network Faults
+= Getting Started with Quarkus Resiliency Testing
 
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
 
-This guide shows you how to get started with Quarkus Network Faults by testing what an endpoint does when the REST service it depends on is down, and when it hangs.
+This guide shows you how to get started with Quarkus Resiliency Testing by testing what an endpoint does when the REST service it depends on is down, and when it hangs.
 
 The Java snippets are taken from the `integration-tests/rest-client-and-datasource` module of the extension, some shortened.
 
 [#install-extension]
 == Install the Extension
 
-Add `quarkus-network-faults-junit` as a test dependency.
-It provides `NetworkFaultsProfile` and brings in `quarkus-network-faults` transitively, so a single dependency is enough:
+Add `quarkus-resiliency-testing-junit` as a test dependency.
+It provides `NetworkFaultsProfile` and brings in `quarkus-resiliency-testing` transitively, so a single dependency is enough:
 
 [source,xml,subs=attributes+]
 ----
 <dependency>
-    <groupId>io.quarkiverse.networkfaults</groupId>
-    <artifactId>quarkus-network-faults-junit</artifactId>
+    <groupId>io.quarkiverse.resiliencytesting</groupId>
+    <artifactId>quarkus-resiliency-testing-junit</artifactId>
     <version>{project-version}</version>
     <scope>test</scope>
 </dependency>
 ----
 
-The core `quarkus-network-faults` extension enables fault injection for all supported integrations already present in your application.
-Support is detected and included automatically when the matching Quarkus extension is present; no integration-specific Network Faults dependencies are needed.
+The core `quarkus-resiliency-testing` extension enables fault injection for all supported integrations already present in your application.
+Support is detected and included automatically when the matching Quarkus extension is present; no integration-specific Resiliency Testing dependencies are needed.
 
 NOTE: Nothing in the extension is active in a production build.
 
@@ -96,7 +96,7 @@ The value is taken after profiles and expressions are resolved, so a profile-spe
 [#enable]
 == Enable Fault Injection in a Test
 
-Give the test class the `NetworkFaultsProfile` test profile and inject `NetworkFaults`:
+Give the test class the `NetworkFaultsProfile` test profile and inject `Faults`:
 
 [source,java]
 ----
@@ -105,7 +105,7 @@ Give the test class the `NetworkFaultsProfile` test profile and inject `NetworkF
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults; // <2>
+    Faults faults; // <2>
 }
 ----
 
@@ -118,7 +118,7 @@ The test classes that share the profile get one application built with the proxi
 [TIP]
 .The test class already has a profile?
 ====
-Have that profile extend `NetworkFaultsProfile`, or copy `quarkus.network-faults.enabled=true` into its configuration overrides.
+Have that profile extend `NetworkFaultsProfile`, or copy `quarkus.resiliency-testing.enabled=true` into its configuration overrides.
 ====
 
 [#first-fault]
@@ -209,7 +209,7 @@ See xref:guard.adoc[The Guard].
 
 The extension has a single configuration property, the one `NetworkFaultsProfile` sets for the test classes that use it:
 
-include::includes/quarkus-network-faults.adoc[leveloffset=+1, opts=optional]
+include::includes/quarkus-resiliency-testing.adoc[leveloffset=+1, opts=optional]
 
 == Going Further
 

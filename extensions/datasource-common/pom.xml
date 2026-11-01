@@ -3,22 +3,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-extensions-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-extensions-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-datasource-common</artifactId>
-    <name>Quarkus Network Faults - Datasource Common</name>
+    <artifactId>quarkus-resiliency-testing-datasource-common</artifactId>
+    <name>Quarkus Resiliency Testing - Datasource Common</name>
     <description>What the JDBC, reactive datasource and Hibernate modules share: datasource target names and database URLs</description>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.datasource</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.datasource</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

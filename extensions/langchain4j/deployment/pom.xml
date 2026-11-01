@@ -3,26 +3,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-langchain4j-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-langchain4j-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-langchain4j-deployment</artifactId>
-    <name>Quarkus Network Faults - LangChain4j - Deployment</name>
+    <artifactId>quarkus-resiliency-testing-langchain4j-deployment</artifactId>
+    <name>Quarkus Resiliency Testing - LangChain4j - Deployment</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.langchain4j.deployment</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.langchain4j.deployment</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment-spi</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-langchain4j</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-langchain4j</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-core-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-core-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-api</artifactId>
-    <name>Quarkus Network Faults - Runtime API</name>
-    <description>The user-facing API (io.quarkiverse.networkfaults) and the SPI other extensions implement (io.quarkiverse.networkfaults.spi)</description>
+    <artifactId>quarkus-resiliency-testing-api</artifactId>
+    <name>Quarkus Resiliency Testing - Runtime API</name>
+    <description>The user-facing API (io.quarkiverse.resiliencytesting) and the SPI other extensions implement (io.quarkiverse.resiliencytesting.spi)</description>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.api</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.api</automatic.module.name>
     </properties>
 
     <dependencies>

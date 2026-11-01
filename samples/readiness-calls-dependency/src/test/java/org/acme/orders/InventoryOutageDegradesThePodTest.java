@@ -6,8 +6,8 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.ActiveFault;
-import io.quarkiverse.networkfaults.NetworkFaults;
+import io.quarkiverse.resiliencytesting.ActiveFault;
+import io.quarkiverse.resiliencytesting.Faults;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -23,7 +23,7 @@ import io.quarkus.test.junit.TestProfile;
 class InventoryOutageDegradesThePodTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void thePodStaysInTheRotationAndSaysWhatItCannotDo() {
