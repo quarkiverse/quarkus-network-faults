@@ -75,6 +75,7 @@
                                 <artifact>${project.groupId}:quarkus-network-faults-hibernate-orm:${project.version}</artifact>
                                 <artifact>${project.groupId}:quarkus-network-faults-mongodb:${project.version}</artifact>
                                 <artifact>${project.groupId}:quarkus-network-faults-mailer:${project.version}</artifact>
+                                <artifact>${project.groupId}:quarkus-network-faults-vertx:${project.version}</artifact>
                             </conditionalDependencies>
                         </configuration>
                     </execution>

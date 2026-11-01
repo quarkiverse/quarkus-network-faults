@@ -13,8 +13,10 @@ public record FaultEnd(Instant at, Verdict verdict, long connectionsSeen, long h
      */
     public enum Verdict {
         /**
-         * Refused and dropped connections never reach the proxy, so {@code unavailable} and {@code connectTimeout}
-         * cannot be judged by their traffic: what the application did is the evidence.
+         * The guard could not watch this fault: refused and dropped connections never reach the proxy, so
+         * {@code unavailable} and {@code connectTimeout} cannot be judged by their traffic, and a pool whose waiters
+         * cannot be observed, the worker pool among them, cannot be judged by them either. What the application did
+         * is the evidence.
          */
         NOT_JUDGED,
         /**

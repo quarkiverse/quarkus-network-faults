@@ -66,6 +66,7 @@ final class CompositeTarget extends CompositeEndpoint implements ObservableTarge
 
     @Override
     public void dropConnections() {
+        requireNotExhausted();
         for (ProxyTarget t : members) {
             t.dropConnections();
         }

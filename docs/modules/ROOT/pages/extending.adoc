@@ -74,6 +74,21 @@ IMPORTANT: The runtime module needs a `META-INF/beans.xml`, empty is enough, for
 
 TIP: A module follows one Quarkus extension exactly and depends on its real types, so it never has to check whether a class is present.
 
+== Offer a Pool
+
+An extension whose beans sit on a pool the application can run out of lets a test exhaust it, through `faults.pool(...)`, by providing a `PoolResolver` as a CDI bean.
+Given the name of a target, as the `BeanTargetResolver` produced it, the resolver returns the `ResourceTarget` behind it, or empty when the target is not its; `AgroalPools` and `ReactivePools` are the models.
+A `ResourceTarget` takes the whole resource in `exhaust()` and hands back an `Exhaustion`, which gives the resource back in `release()` and answers two questions for xref:guard.adoc#exhausted-pools[the guard]: `watched()`, whether anything could observe callers waiting while the resource was held, and `contended()`, whether any did.
+An exhaustion that was not watched is reported as not judged; one that was watched and saw nothing wait fails the test.
+
+A pool is exhausted in tests that have no proxies, so both the `PoolResolver` and the `BeanTargetResolver` that names the pool's bean must be present without fault injection on.
+Neither Agroal nor the Vert.x SQL client offers a hook for a caller starting to wait; the two modules share `ContentionSampler` from the `datasource-common` module, which samples the pool's count of waiting callers while the pool is held.
+
+== Watch the Event Loops
+
+An extension that knows the application's event loops provides an `EventLoopWatcher` as a CDI bean, for `faults.eventLoops()`.
+A watch reports the event loops that were blocked while it was open, one line each; `VertxEventLoopWatcher` is the one, built on the blocked-thread checker of Vert.x.
+
 == Undo the Consequences
 
 An extension that owns state a fault leaves behind, such as a connection pool or a circuit breaker, provides a `ConsequenceCleaner` as a CDI bean.

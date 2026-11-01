@@ -126,6 +126,7 @@
             </activation>
             <modules>
                 <module>integration-tests</module>
+                <module>samples</module>
             </modules>
         </profile>
     </profiles>

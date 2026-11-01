@@ -12,6 +12,8 @@ import io.quarkiverse.networkfaults.NetworkFaults;
 import io.quarkiverse.networkfaults.runtime.internal.NetworkFaultsRecorder;
 import io.quarkiverse.networkfaults.spi.BeanTargetResolver;
 import io.quarkiverse.networkfaults.spi.ConsequenceCleaner;
+import io.quarkiverse.networkfaults.spi.EventLoopWatcher;
+import io.quarkiverse.networkfaults.spi.PoolResolver;
 import io.quarkus.arc.All;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.deployment.IsNormal;
@@ -35,10 +37,14 @@ class NetworkFaultsBeanProcessor {
         return SyntheticBeanBuildItem.configure(NetworkFaults.class)
                 .scope(Singleton.class)
                 .setRuntimeInit()
-                // every resolver and every cleaner in the application, whichever module brought it
+                // every resolver, cleaner, pool and event-loop watcher in the application, whichever module brought it
                 .addInjectionPoint(ParameterizedType.create(List.class, ClassType.create(BeanTargetResolver.class)),
                         AnnotationInstance.builder(All.class).build())
                 .addInjectionPoint(ParameterizedType.create(List.class, ClassType.create(ConsequenceCleaner.class)),
+                        AnnotationInstance.builder(All.class).build())
+                .addInjectionPoint(ParameterizedType.create(List.class, ClassType.create(PoolResolver.class)),
+                        AnnotationInstance.builder(All.class).build())
+                .addInjectionPoint(ParameterizedType.create(List.class, ClassType.create(EventLoopWatcher.class)),
                         AnnotationInstance.builder(All.class).build())
                 .createWith(recorder.networkFaults(shutdown))
                 // the after-each callback looks it up programmatically, which bean removal does not see

@@ -9,6 +9,8 @@ import jakarta.enterprise.util.TypeLiteral;
 import io.quarkiverse.networkfaults.NetworkFaults;
 import io.quarkiverse.networkfaults.spi.BeanTargetResolver;
 import io.quarkiverse.networkfaults.spi.ConsequenceCleaner;
+import io.quarkiverse.networkfaults.spi.EventLoopWatcher;
+import io.quarkiverse.networkfaults.spi.PoolResolver;
 import io.quarkiverse.networkfaults.spi.TargetDescriptor;
 import io.quarkus.arc.All;
 import io.quarkus.arc.SyntheticCreationalContext;
@@ -43,7 +45,11 @@ public class NetworkFaultsRecorder {
                 }, All.Literal.INSTANCE);
                 List<ConsequenceCleaner> cleaners = context.getInjectedReference(new TypeLiteral<>() {
                 }, All.Literal.INSTANCE);
-                return new NetworkFaultsImpl(enabled, resolvers, cleaners);
+                List<PoolResolver> pools = context.getInjectedReference(new TypeLiteral<>() {
+                }, All.Literal.INSTANCE);
+                List<EventLoopWatcher> eventLoopWatchers = context.getInjectedReference(new TypeLiteral<>() {
+                }, All.Literal.INSTANCE);
+                return new NetworkFaultsImpl(enabled, resolvers, cleaners, pools, eventLoopWatchers);
             }
         };
     }

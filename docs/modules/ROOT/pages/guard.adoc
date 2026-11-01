@@ -3,7 +3,7 @@
 include::./includes/attributes.adoc[]
 include::./includes/customization.adoc[]
 
-The guard fails a test whose fault no connection went through, because such a test cannot have tested the fault.
+The guard fails a test whose fault no connection went through, or whose exhausted pool nothing waited on, because such a test cannot have tested the fault.
 
 == Overview
 
@@ -25,7 +25,7 @@ If a fault was active on a target and no connection went through the proxy of th
 
 [source]
 ----
-Network fault had no effect:
+Fault had no effect:
   Target [rest-client:inventory]: the 'slow 10ms' fault was active but no connection went
   through the proxy while it was, so it cannot have affected the test. Is the application
   really using quarkus.rest-client.inventory.url?
@@ -40,7 +40,7 @@ If the dependency itself is unreachable, the application gets a connection reset
 
 [source]
 ----
-Network fault had no effect:
+Fault had no effect:
   Target [rest-client:inventory]: the 'respondsWith 503' fault was active but the proxy could
   not connect to the upstream inventory:8080 (Connection refused), so the application's
   connections were reset instead. A fault acts on a connection only once the upstream has
@@ -59,9 +59,25 @@ NOTE: Refused and dropped connection attempts never reach the proxy, so `unavail
 
 The guard is deliberately strict: a test that applies a fault and then never exercises the dependency asserts nothing about the fault, and the failure says so.
 
+[#exhausted-pools]
+== Exhausted Pools
+
+An exhaustion is judged by whether anything waited on it:
+
+* For a connection pool, a thread must have asked it for a connection while it was exhausted
+* For a reactive pool, a query must have asked it for a connection while it was exhausted
+
+If nothing did, the test fails with the same `Fault had no effect:` heading, because the endpoint does not use that datasource or the wrong one was named in `target(...)`.
+A failed event-loop watch and a guard failure are both reported, the guard's as a suppressed exception.
+
+There is no guard for the worker pool: its queue cannot be observed, and every blocking request made during the window meets the condition anyway.
+A reactive pool with `max-wait-queue-size=0` has none either, since it turns callers away at once instead of making them wait, so nothing can be watched.
+Nor has a pool whose callers wait less than ten milliseconds, an Agroal `acquisition-timeout` or a reactive `connection-timeout` under that: a caller is seen while it waits, and such a wait is too short to be seen reliably.
+An exhaustion the guard cannot watch is reported as _not judged_, as `unavailable` and `connect-timeout` are.
+
 == After Each Test
 
-The guard comes with `NetworkFaultsProfile`, and so does the cleanup: after each test every fault is ended and its consequences are undone, which means Agroal pools are flushed and SmallRye Fault Tolerance circuit breakers are reset.
+The guard and the cleanup run after each `@QuarkusTest` with the `quarkus-network-faults-junit` module on the classpath, with or without `NetworkFaultsProfile`: every fault is ended and its consequences are undone, which means Agroal pools are flushed and SmallRye Fault Tolerance circuit breakers are reset, all of it after the last exhaustion has ended.
 
 == Going Further
 

@@ -65,7 +65,7 @@ final class MarkdownReport {
             return "not judged until the fault ends";
         }
         return switch (e.verdict()) {
-            case NOT_JUDGED -> "not judged: refused and dropped connections never reach the proxy";
+            case NOT_JUDGED -> "not judged: the guard could not watch this fault";
             case SAW_TRAFFIC -> "saw traffic, " + e.connectionsSeen() + " connections and " + e.httpRequestsSeen()
                     + " HTTP requests while it was active";
             case NO_TRAFFIC -> "no connection went through the proxy while it was active";

@@ -1,0 +1,95 @@
+= Incidents, Reproduced
+
+include::./includes/attributes.adoc[]
+include::./includes/customization.adoc[]
+
+Each module listed here, under https://github.com/quarkiverse/quarkus-network-faults/tree/main/samples[`samples/`], is one small application with a bug, a `@QuarkusTest` that shows it, and a `@TestProfile` that switches the fix on so the same scenario passes.
+Each has a README that says which test to read first.
+
+The application of the https://quarkus.io/blog/quarkus-network-faults/[Introducing Quarkus Network Faults] blog post is the other shape, in https://github.com/quarkiverse/quarkus-network-faults/tree/main/samples/resilient-orders[`samples/resilient-orders`]: one order service with a REST Client, a database, Kafka, Redis and an LLM provider, and sixteen tests that each pin one protection, a lost payment response, a database that restarts or dies mid-transaction and a poison message among them.
+Its README says what each test catches.
+
+The first three are found with a network fault on the dependency; the other eight with `exhausted()`, `workerPool()` or `eventLoops()`, and need no `NetworkFaultsProfile`.
+
+== Three Network Incidents
+
+[cols="2,4,4",options="header"]
+|===
+|Module |The bug |The fix
+
+|`rest-client-default-timeout`
+|The REST Client is left on its defaults, so a hung inventory holds every order for thirty seconds
+|`quarkus.rest-client.inventory.read-timeout`, a bound the application chose
+
+|`stalled-stream`
+|A Server-Sent Events stream goes quiet after its first event, and the client's read timeout does not fire: it is cancelled once the response headers arrive
+|An idle timeout on the stream itself, `ifNoItem().after(...)`
+
+|`readiness-calls-dependency`
+|The readiness check asks the inventory service whether it is up, so one dependency down takes every pod out of rotation
+|Readiness reports the pod's own state; what needs the inventory answers 503 with `Retry-After`
+|===
+
+== Eight Overload Incidents
+
+[cols="2,4,4",options="header"]
+|===
+|Module |The bug |The fix
+
+|`pool-exhausted-500`
+|Pool full: the endpoint throws and answers 500, so clients and balancers retry at once
+|An exception mapper answering 503 with `Retry-After`
+
+|`liveness-hits-database`
+|The liveness check queries the database, so a pod that is merely busy is killed and restarted
+|The database check is readiness only
+
+|`retry-amplification`
+|`@Retry` on the database call: one request asks the full pool four times, and the client's retry makes it eight
+|`@CircuitBreaker`: one attempt per request, then none, and it recovers when connections are back
+
+|`shared-audit-pool`
+|Audit writes use the default datasource, so a slow audit table takes the orders down with it
+|A named `audit` datasource with a pool of its own
+
+|`unbounded-worker-queue`
+|No `queue-size`: a blocking request waits for as long as it takes, and the client's deadline passes first
+|`quarkus.thread-pool.queue-size`, so the excess is answered 503 at once
+
+|`blocking-status-endpoint`
+|A status endpoint that does no I/O still needs a worker thread, so saturation takes it down too
+|`@NonBlocking`
+
+|`blocking-on-event-loop`
+|A `Uni` endpoint makes a JDBC call on the event loop; it only shows when the pool makes the call wait
+|`@Blocking`
+
+|`reactive-wait-queue`
+|No `max-wait-queue-size`: a query waits up to thirty seconds for a connection, and the client's deadline passes first
+|`quarkus.datasource.reactive.max-wait-queue-size`, so the excess fails at once
+|===
+
+== Running One
+
+The samples need Docker for the PostgreSQL Dev Service, and the extension in the local Maven repository (`./mvnw install -DskipTests`).
+Then:
+
+[source,bash]
+----
+./mvnw -pl samples/stalled-stream test
+----
+
+The blog post's application is a build of its own, and needs Docker for Kafka and Redis as well:
+
+[source,bash]
+----
+./mvnw -f samples/resilient-orders/pom.xml verify
+----
+
+== Going Further
+
+[.lead]
+* xref:guide-rest-client.adoc[Testing a failing REST dependency]
+* xref:guide-database.adoc[Testing a failing database]
+* xref:guide-overload.adoc[Testing overload]
+* xref:timeouts.adoc[Client Timeout Defaults], which is where most of these incidents start

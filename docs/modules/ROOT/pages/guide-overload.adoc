@@ -1,0 +1,246 @@
+= Testing Overload
+
+include::./includes/attributes.adoc[]
+include::./includes/customization.adoc[]
+
+In a `@QuarkusTest` your pools are always empty: there is one request at a time, so a pool of 20 connections always has 19 free.
+In a production incident they are full.
+When a slow query or a traffic spike uses up all 20 database connections or all worker threads, what happens to the 21st request, or to Kubernetes calling `/q/health/live`?
+
+* Does the endpoint wait forever, because no acquisition timeout is configured, until Kubernetes kills and restarts the pod?
+* Does it throw an unhandled exception and answer `500` instead of `503` with `Retry-After`, so load balancers and clients retry at once against a pod that is already struggling?
+* Does `/q/health/ready` report `503`, so Kubernetes stops routing traffic to the pod, while `/q/health/live` still answers `200`, so Kubernetes does not restart it?
+
+Mocking `DataSource` or `Pool` cannot answer these, since it bypasses Agroal, Vert.x, transactions, health checks and the real exception chain of SmallRye Fault Tolerance.
+A load generator in CI is slow and flaky.
+Instead, inside a try-with-resources block the extension takes the whole pool, or every worker thread, so the very next request of the test meets the state the 21st request meets under load.
+
+== The Test
+
+[source,java]
+----
+@QuarkusTest
+class OrderResourceTest {
+
+    @Inject
+    NetworkFaults faults;
+
+    @Test
+    void poolExhausted() {
+        try (var ignored = faults.pool(DataSource.class).exhausted()) {
+            // no connection to be had: the caller is told to come back later instead of getting a 500
+            when().get("/orders").then().statusCode(503).header("Retry-After", "1");
+            // readiness reports 503 so Kubernetes stops sending traffic, while liveness stays 200 so the pod is not killed
+            when().get("/q/health/ready").then().statusCode(503);
+            when().get("/q/health/live").then().statusCode(200);
+        }
+
+        // the connections are back and the circuit breakers are reset: the application recovers
+        when().get("/orders").then().statusCode(200);
+        when().get("/q/health/ready").then().statusCode(200);
+    }
+}
+----
+
+`pool(DataSource.class)`, `pool(Pool.class)` for a reactive pool, `workerPool()` and `eventLoops()` need no `NetworkFaultsProfile`: nothing is rewritten at build time, and nothing is registered in a production build.
+A pool is addressed like a target, by the bean the application uses it through, and `target(DataSource.class)` is the connection of the same datasource, for network faults; without the profile it fails with a message telling you to enable it.
+Support for each kind of resource is picked up from the extensions already in the application.
+
+== Five Questions You Can Answer in CI
+
+[cols="3,3,4",options="header"]
+|===
+|Question |How teams test it today |With `exhausted()`
+
+|If our DB pool is full, do we return `503` with `Retry-After`, and fail `/q/health/ready` while keeping `/q/health/live` up, or crash with a `500`?
+|They don't, or they mock `SQLException` and guess what Agroal or Vert.x throws.
+|`faults.pool(DataSource.class).exhausted()` triggers the real pool acquisition timeout on the endpoints and the readiness probe.
+
+|Does our `@CircuitBreaker` trip when the pool runs dry, and does the application recover once connections return?
+|Hard to trigger without concurrent requests, and an open breaker pollutes later tests.
+|Exhaust the pool, assert the breaker opens after the threshold, and assert `200` right after the `try` block: breakers opened meanwhile are reset.
+
+|If the `audit` database is out of connections, can users still place orders? (bulkhead isolation)
+|Hard to reproduce without two databases and a flood on one.
+|Exhaust only `@DataSource("audit")` or `@ReactiveDataSource("audit")` and assert that `/orders` still answers `200`.
+
+|If all worker threads are busy, do `@NonBlocking` endpoints and `/q/health/live` still respond?
+|Only discovered during a production outage, when Kubernetes restarts the pod.
+|`faults.workerPool().exhausted()` occupies every worker thread: blocking endpoints are rejected or wait, while `@NonBlocking` endpoints and `/q/health/live` answer `200`.
+
+|Did someone put a blocking call on a Vert.x event loop?
+|Vert.x prints a `WARN` that nobody reads in CI.
+|`faults.eventLoops().watched()` fails the test with an `AssertionError` if an event loop was blocked during the window.
+|===
+
+=== Examples
+
+Graceful degradation and health probes under pool exhaustion:
+
+[source,java]
+----
+try (var ignored = faults.pool(DataSource.class).exhausted()) {
+    when().get("/orders").then().statusCode(503).header("Retry-After", "1");
+    // readiness checks the datasource, so Kubernetes stops sending traffic to this pod
+    when().get("/q/health/ready").then().statusCode(503);
+    // liveness does not touch the database, so Kubernetes does not kill and restart the pod
+    when().get("/q/health/live").then().statusCode(200);
+}
+when().get("/q/health/ready").then().statusCode(200);
+----
+
+Circuit breaker trip and automatic recovery:
+
+[source,java]
+----
+try (var ignored = faults.pool(DataSource.class).exhausted()) {
+    when().get("/orders/guarded").then().statusCode(503).header("X-Reason", "no-connection");
+    when().get("/orders/guarded").then().statusCode(503).header("X-Reason", "no-connection");
+    // two failures: the @CircuitBreaker is now open and fails fast without waiting on the pool
+    when().get("/orders/guarded").then().statusCode(503).header("X-Reason", "circuit-open");
+}
+// the connections are back, and the breaker is reset once the last exhaustion has ended
+when().get("/orders/guarded").then().statusCode(200);
+----
+
+Bulkhead isolation across named datasources, JDBC or reactive:
+
+[source,java]
+----
+var audit = new io.quarkus.agroal.DataSource.DataSourceLiteral("audit");
+try (var ignored = faults.pool(DataSource.class, audit).exhausted()) {
+    when().get("/orders/audit").then().statusCode(503);
+    // the default datasource is untouched: orders keep working
+    when().get("/orders").then().statusCode(200);
+}
+----
+
+Worker pool saturation against non-blocking endpoints and liveness probes:
+
+[source,java]
+----
+try (var ignored = faults.workerPool().exhausted()) {
+    // no worker thread and no queue: Quarkus rejects the blocking dispatch with 503
+    when().get("/work").then().statusCode(503);
+    // event-loop endpoints and liveness probes are unaffected
+    when().get("/work/status").then().statusCode(200);
+    when().get("/q/health/live").then().statusCode(200);
+}
+----
+
+The `503` needs `quarkus.thread-pool.queue-size=0` in the test configuration.
+With the default queue, which is unbounded, a blocking request waits for a thread for as long as the fault lasts.
+
+A blocking call on a Vert.x event loop:
+
+[source,java]
+----
+try (var ignored = faults.eventLoops().watched()) {
+    when().get("/orders").then().statusCode(200);
+}
+// throws AssertionError if the handler slept, locked or did blocking I/O on an event loop
+----
+
+== Faults
+
+[cols="2,1,4",options="header"]
+|===
+|Pool |Fault |What it does
+
+|`pool(DataSource.class)` (Agroal), with its `@DataSource` qualifier for a named datasource
+|`exhausted()`
+|Checks out every connection of the pool and holds them. The application's `getConnection()` waits for `quarkus.datasource.jdbc.acquisition-timeout`, 5 seconds by default, and fails. Lower the timeout in the test configuration to keep tests short, but not under ten milliseconds, below which the pool has no xref:guard.adoc#exhausted-pools[guard]. Works with `multiple-acquisition=strict` and inside transactions; see <<agroal-strict,the Agroal note>>.
+
+|`pool(Pool.class)`, `io.vertx.sqlclient.Pool` or `io.vertx.mutiny.sqlclient.Pool`, with its `@ReactiveDataSource` qualifier for a named datasource
+|`exhausted()`
+|Takes every connection of the pool and holds them. Queries wait for `quarkus.datasource.reactive.connection-timeout`, 30 seconds by default, and fail; lower it in the test configuration, but not under ten milliseconds, below which the pool has no xref:guard.adoc#exhausted-pools[guard]. With `max-wait-queue-size` set, queries past the queue fail at once.
+
+|`faults.workerPool()`
+|`exhausted()`
+|Occupies every worker thread. A blocking request queues for as long as it takes, or, with `quarkus.thread-pool.queue-size` set, is rejected and answered with a 503 by Quarkus; non-blocking requests are unaffected.
+
+|`faults.eventLoops()`
+|`watched()`
+|Not a fault. Ending the window fails the test if an event loop was blocked meanwhile for longer than `quarkus.vertx.max-event-loop-execute-time`; see <<event-loops,below>>.
+|===
+
+`faults.targetNames()` lists the proxies alone: with `NetworkFaultsProfile` a datasource appears as `datasource:<name>:jdbc` or `datasource:<name>:reactive`, without it the set is empty, and the worker pool, which has no proxy, is never in it.
+There is no `target(ExecutorService.class)`: the worker pool is `faults.workerPool()`.
+
+[#agroal-strict]
+IMPORTANT: With `multiple-acquisition=strict` and no `leak-detection-interval`, Agroal 3.2.1 does not clear the holding thread when a connection is returned, so a reused worker thread is refused a connection with no overload at all.
+Set `leak-detection-interval` on such a datasource in the test configuration.
+
+== How It Works
+
+*The condition is applied, not reproduced.*
+A load test earns its saturation by sending enough traffic to use the pool up.
+The failures that follow, timeouts, queueing and rejection, depend on the ratio of demand to the pool and not on the absolute numbers: two requests against a pool of two with nothing free behave as a thousand do against a pool of fifty.
+So the extension takes the pool whole, and one request is enough to meet the condition.
+It is the move the network faults make for dependencies: no flaky network is built, one dependency hangs for a window.
+
+*Assertions are about behaviour, not time.*
+A `p99 < 50 ms` assertion holds on one machine and fails on the next.
+What the application answers, how many calls it makes, whether a breaker opened and whether it recovers carry over, and they are what these tests assert.
+
+*Recovery is a test of its own.*
+The overload failures that hurt are the ones that outlive their trigger: the traffic drops and the application stays down, most often because of retries and queued work.
+Close the window and assert that the next request succeeds.
+Note what that proves: when the last exhaustion ends, the extension flushes the Agroal pools and resets the SmallRye Fault Tolerance circuit breakers, so the request after the block meets a pool and a breaker that were put back, not ones that came back on their own.
+A breaker's own delay, or a queue that drains, is not what that assertion measures.
+
+*Faults compose by rule.*
+
+* A target has one exhaustion at a time; exhausting it again throws `IllegalStateException`
+* A network fault is refused on a target whose pool is exhausted, and an exhaustion on a pool whose target has a network fault is refused as well, in either order, with `IllegalStateException`
+* All cleanup waits for the last exhaustion, the Agroal flush as well as the circuit breaker reset: a breaker that opened while a target was exhausted is reset when that exhaustion ends, even if a network fault on another target ended earlier, and connections that fault broke stay in the pool until then
+* The event-loop watch runs no cleaners and defers none
+
+== What It Can and Cannot Tell You
+
+It can tell you how the application behaves when a resource it needs is saturated: what it answers, what it retries, whether paths that do not need the resource keep working, and whether it comes back once the resource does.
+It can also tell you whether the request under test blocks an event loop.
+
+It cannot tell you how much load the application takes.
+Capacity, throughput, latency percentiles and SLO compliance need a real load generator on another machine.
+It does not find slow code, since nothing is timed, and it does not reproduce failures that need scale to appear: garbage collection on a large heap, lock contention across many cores, file descriptor and kernel limits.
+
+[#event-loops]
+== Event Loops: the One Check That Is Timed
+
+The event loops cannot be exhausted to any effect.
+Block them all and the server answers nothing, the test's own request included; block all but one and the application works as usual.
+What a test can show is that the request under test does not block one:
+
+[source,java]
+----
+try (var ignored = faults.eventLoops().watched()) {
+    when().get("/orders").then().statusCode(200);
+}
+// fails here if a handler slept, locked or did I/O on an event loop
+----
+
+The watch uses the blocked-thread checker of Vert.x, the one behind the "Thread ... has been blocked" warning, so it is the one check here that involves time: a loop counts as blocked once it has run one task for `quarkus.vertx.max-event-loop-execute-time`, 2 seconds by default.
+Set it, and `quarkus.vertx.blocked-thread-check-interval`, low in the test configuration; a non-blocking handler is done in microseconds, so a limit of 100 milliseconds is far above anything legitimate and far below a real block.
+A block too short to cross it is best made long: a `hangs()` fault on the dependency the handler calls turns any blocking call on the event loop into one the watch sees.
+
+While a watch is open, its handler replaces the one Vert.x logs the warning with, and Vert.x offers no way to read the previous handler back, so the watch installs an equivalent of the default when it ends rather than restoring what was there.
+Quarkus installs no handler of its own; a library that does would have its handler replaced by a watch.
+
+== The Guard
+
+A test whose exhaustion nothing waited on fails with `Fault had no effect:`, because the request under test never met the condition.
+See xref:guard.adoc#exhausted-pools[The Guard] for what counts as having waited, and for the pools that have no guard.
+
+== Eight Incidents, Reproduced
+
+Every overload module under `samples/` is one small application with an overload bug, a `@QuarkusTest` that fails on it, and a `@TestProfile` that switches the fix on so the same scenario passes: a pool that answers 500, a liveness check that hits the database, a retry that multiplies the load, a shared audit pool, an unbounded worker queue, a status endpoint that blocks, a JDBC call on the event loop, and an unbounded reactive wait queue.
+They are listed, with the network incidents, on xref:samples.adoc[Incidents, Reproduced].
+
+== Going Further
+
+[.lead]
+* xref:guide-pool-exhaustion.adoc[Testing Pool Exhaustion], to fill a pool with a hung database
+* xref:guard.adoc[The Guard]
+* xref:faults.adoc[Faults Reference]
+* xref:targets.adoc[Targets Reference]

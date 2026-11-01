@@ -7,7 +7,8 @@ package io.quarkiverse.networkfaults;
  * <p>
  * A fault on a target has it to itself: applying one while any fault is active on it, on some of its requests or on
  * any of the connections it is made of, throws {@link IllegalStateException}, and so does applying a fault to some of
- * its requests while it has one.
+ * its requests while it has one. A target whose pool is exhausted, through {@link NetworkFaults#pool}, takes no
+ * network fault and no {@link #dropConnections()}, which throw {@link IllegalStateException} too.
  */
 public interface Target extends Endpoint {
 

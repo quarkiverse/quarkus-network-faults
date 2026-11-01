@@ -21,7 +21,7 @@ class NetworkFaultsImplTest {
 
     @Test
     void duplicateQualifiersDoNotSurfaceAsADuplicateElementError() {
-        NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of());
+        NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of(), List.of(), List.of());
         Any any = Any.Literal.INSTANCE;
         // No resolver matches String here, so resolution still fails - but with a helpful "no extension
         // recognises" message, not the bare "duplicate element" IllegalArgumentException that Set.of(qualifiers)
@@ -34,7 +34,7 @@ class NetworkFaultsImplTest {
 
     @Test
     void aDisabledInstanceSaysSoBeforeLookingForTheBean() {
-        NetworkFaultsImpl faults = new NetworkFaultsImpl(false, List.of(), List.of());
+        NetworkFaultsImpl faults = new NetworkFaultsImpl(false, List.of(), List.of(), List.of(), List.of());
         // not "no extension recognises String": which resolvers exist says nothing while fault injection is off
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> faults.target(String.class));
         assertTrue(e.getMessage().contains("not enabled"), e.getMessage());
@@ -49,7 +49,7 @@ class NetworkFaultsImplTest {
             registry.targetFor(TargetName.of("rest-client", "a"), upstream, "a.url");
             registry.targetFor(TargetName.of("rest-client", "b"), upstream, "b.url");
             registry.targetFor(TargetName.of("datasource", "users"), upstream, "users.url");
-            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of());
+            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of(), List.of(), List.of());
             faults.byName("rest-client").unavailable(); // one fault, both rest clients
             faults.byName("datasource:users").unavailable();
             assertEquals(2, faults.activeFaultCount());
@@ -73,7 +73,7 @@ class NetworkFaultsImplTest {
         try {
             // no connection goes through this proxy, so its upstream is never dialled
             registry.targetFor(TargetName.of("rest-client", "a"), Upstream.of("localhost", 1), "a.url");
-            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of());
+            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of(), List.of(), List.of());
             List<String> seen = new ArrayList<>();
             faults.addFaultListener(new FaultListener() {
                 @Override
@@ -102,7 +102,7 @@ class NetworkFaultsImplTest {
         try {
             // no connection goes through this proxy, so its upstream is never dialled
             registry.targetFor(TargetName.of("rest-client", "a"), Upstream.of("localhost", 1), "a.url");
-            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of());
+            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of(), List.of(), List.of());
             List<String> seen = new CopyOnWriteArrayList<>();
             faults.addFaultListener(new FaultListener() {
                 @Override

@@ -7,6 +7,18 @@ A connection pool has a limit on how many database connections it can provide.
 If every connection is busy waiting for a hung database, the next request must wait for one to become available.
 The pool's *acquisition timeout* limits that wait.
 
+To test how the application behaves when a pool is full, whatever filled it, use `exhausted()`: it takes every connection of the pool and holds them until the block ends, with no database involved.
+
+[source,java]
+----
+try (var ignored = faults.pool(DataSource.class, new DataSourceLiteral("audit")).exhausted()) {
+    when().get("/audit/count").then().statusCode(500);
+}
+----
+
+It needs no `NetworkFaultsProfile`; see xref:guide-overload.adoc[Testing overload].
+The rest of this guide is for when the cause matters: a pool filled by requests stuck on a hung database, which also shows what the driver's timeouts do.
+
 This guide tests two questions:
 
 * Does a request fail within a bounded time when every connection is busy?

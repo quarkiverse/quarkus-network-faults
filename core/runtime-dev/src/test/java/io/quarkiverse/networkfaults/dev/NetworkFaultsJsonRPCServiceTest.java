@@ -21,7 +21,7 @@ class NetworkFaultsJsonRPCServiceTest {
             // no connection goes through this proxy, so its upstream is never dialled
             NetworkFaultsRuntime.registry().targetFor(TargetName.of("datasource", "users"), Upstream.of("localhost", 1),
                     "users.url");
-            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of());
+            NetworkFaultsImpl faults = new NetworkFaultsImpl(true, List.of(), List.of(), List.of(), List.of());
             NetworkFaultsJsonRPCService service = new NetworkFaultsJsonRPCService(faults, new FaultHistory(faults));
             service.apply("datasource:users", "hangs", null, null, null, null);
             String before = faults.byName("datasource:users").currentFault();
