@@ -11,7 +11,7 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <quarkus.version>4.0.0.Beta1</quarkus.version>
+        <quarkus.version>4.0.0.Beta2</quarkus.version>
         <resiliency-testing.version>999-SNAPSHOT</resiliency-testing.version>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
     </properties>
