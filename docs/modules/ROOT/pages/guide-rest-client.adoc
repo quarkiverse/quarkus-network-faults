@@ -17,7 +17,7 @@ This guide shows how to test a request when the REST service it depends on:
 
 == Prerequisites
 
-The test class uses the `NetworkFaultsProfile` test profile and injects `NetworkFaults`, as described in the xref:quickstart.adoc[Quick start].
+The test class uses the `NetworkFaultsProfile` test profile and injects `Faults`, as described in the xref:quickstart.adoc[Quick start].
 
 The samples address the client by its interface, `faults.target(InventoryClient.class)`.
 The local `InventoryServer` test resource provides the upstream service.
@@ -229,7 +229,7 @@ The snippets are taken from `StockStreamTest` in `integration-tests/rest-client-
 
 === Sample Stream
 
-The examples use static imports of `afterHeaders`, `afterChunks`, and `afterSseEvents` from `io.quarkiverse.networkfaults.Moment.Http`.
+The examples use static imports of `afterHeaders`, `afterChunks`, and `afterSseEvents` from `io.quarkiverse.resiliencytesting.Moment.Http`.
 
 The local inventory stub sends three Server-Sent Events, containing `1`, `2`, and `3`, in a chunked HTTP/1.1 response.
 The application's `/stock/updates` endpoint consumes that stream and returns `200` with `1,2,3` when it completes.

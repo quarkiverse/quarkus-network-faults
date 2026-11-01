@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-integration-tests-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-integration-tests-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-integration-tests-overload-worker-pool</artifactId>
-    <name>Quarkus Network Faults - Integration Tests - Overload Worker Pool</name>
+    <artifactId>quarkus-resiliency-testing-integration-tests-overload-worker-pool</artifactId>
+    <name>Quarkus Resiliency Testing - Integration Tests - Overload Worker Pool</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.it.overload</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.it.overload</automatic.module.name>
     </properties>
 
     <dependencies>

@@ -23,7 +23,7 @@ Instead, inside a try-with-resources block the extension takes the whole pool, o
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void poolExhausted() {

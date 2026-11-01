@@ -1,5 +1,5 @@
-name: Network Faults - Messaging Kafka
-description: Network fault targets for Messaging Kafka, included automatically when both quarkus-network-faults and the Messaging Kafka extension are present
+name: Resiliency Testing - Messaging Kafka
+description: Network fault targets for Messaging Kafka, included automatically when both quarkus-resiliency-testing and the Messaging Kafka extension are present
 metadata:
   keywords:
     - testing

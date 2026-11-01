@@ -1,0 +1,34 @@
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[.header-title]##Configuration property##
+h|Type
+h|Default
+
+a|icon:lock[title=Fixed at build time] [[quarkus-resiliency-testing_quarkus-resiliency-testing-enabled]] [.property-path]##link:#quarkus-resiliency-testing_quarkus-resiliency-testing-enabled[`+++quarkus.resiliency-testing.enabled+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.resiliency-testing.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Whether outbound connections are routed through fault-injecting proxies. Decided at build time: when off, the extension registers no interceptor and no proxy. Exhausting a pool or the worker pool and watching the event loops need no flag: they work on the application itself, not on its connections.
+
+Off by default. Test classes opt in with `@TestProfile(NetworkFaultsProfile.class)`, whose config overrides set this to `true` for the build made for that profile.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_RESILIENCY_TESTING_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_RESILIENCY_TESTING_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++false+++`
+
+|===
+

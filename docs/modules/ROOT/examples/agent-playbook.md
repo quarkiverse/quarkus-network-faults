@@ -1,36 +1,36 @@
-# Network faults agent playbook
+# Resiliency Testing agent playbook
 
 ## What this is
 
-Quarkus Network Faults puts a proxy in front of every outbound connection of the application: REST Clients, datasources, Redis, MongoDB, mailers, GraphQL and gRPC clients, Quarkus LangChain4j models and MCP servers.
+Quarkus Resiliency Testing puts a proxy in front of every outbound connection of the application: REST Clients, datasources, Redis, MongoDB, mailers, GraphQL and gRPC clients, Quarkus LangChain4j models and MCP servers.
 In dev mode, the Dev MCP tools below apply faults to those proxies in the running application, so you can make a dependency fail on purpose and watch what the application does.
 
 An experiment finds out what the application really does when one dependency fails in one way.
-Its purpose is a test: what you observe is what the test asserts, so every experiment ends with a test written with the Dev MCP resource `quarkus-network-faults_testWritingGuide`.
+Its purpose is a test: what you observe is what the test asserts, so every experiment ends with a test written with the Dev MCP resource `quarkus-resiliency-testing_testWritingGuide`.
 
 ## The tools
 
-Over Dev MCP every tool carries the prefix `quarkus-network-faults_`.
+Over Dev MCP every tool carries the prefix `quarkus-resiliency-testing_`.
 
 | Tool | Enabled | What it does |
 |---|---|---|
-| `quarkus-network-faults_getStatus` | by default | Whether fault injection is on, how many faults are active, every target. Call it first |
-| `quarkus-network-faults_getTargets` | by default | Every target: `name`, `kind`, `sourceProperty`, `upstream`, `plaintextHttp`, `fault`, counters, open connections |
-| `quarkus-network-faults_getFaults` | by default | Every fault spec `apply` accepts, with what the application sees |
-| `quarkus-network-faults_getEvents` | by default | The event log of a target, oldest first |
-| `quarkus-network-faults_getRequests` | by default | The HTTP requests a target saw, with `responseStatus` and `responseTimeMillis`; plaintext HTTP targets only |
-| `quarkus-network-faults_getHistory` | by default | Every fault applied since the application started, newest first, with the guard's `verdict` |
-| `quarkus-network-faults_getReport` | by default | A Markdown report of targets, faults and counters |
-| `quarkus-network-faults_resetAll` | by default | Ends every fault on every target |
-| `quarkus-network-faults_apply` | opt-in | `apply(target, fault, requests, body, contentType, headers)`: applies one fault |
-| `quarkus-network-faults_reset` | opt-in | Ends every fault on one target |
-| `quarkus-network-faults_dropConnections` | opt-in | Closes the open connections of a target once; no fault stays active |
+| `quarkus-resiliency-testing_getStatus` | by default | Whether fault injection is on, how many faults are active, every target. Call it first |
+| `quarkus-resiliency-testing_getTargets` | by default | Every target: `name`, `kind`, `sourceProperty`, `upstream`, `plaintextHttp`, `fault`, counters, open connections |
+| `quarkus-resiliency-testing_getFaults` | by default | Every fault spec `apply` accepts, with what the application sees |
+| `quarkus-resiliency-testing_getEvents` | by default | The event log of a target, oldest first |
+| `quarkus-resiliency-testing_getRequests` | by default | The HTTP requests a target saw, with `responseStatus` and `responseTimeMillis`; plaintext HTTP targets only |
+| `quarkus-resiliency-testing_getHistory` | by default | Every fault applied since the application started, newest first, with the guard's `verdict` |
+| `quarkus-resiliency-testing_getReport` | by default | A Markdown report of targets, faults and counters |
+| `quarkus-resiliency-testing_resetAll` | by default | Ends every fault on every target |
+| `quarkus-resiliency-testing_apply` | opt-in | `apply(target, fault, requests, body, contentType, headers)`: applies one fault |
+| `quarkus-resiliency-testing_reset` | opt-in | Ends every fault on one target |
+| `quarkus-resiliency-testing_dropConnections` | opt-in | Closes the open connections of a target once; no fault stays active |
 
 `target` is a name from `getTargets`, such as `rest-client:inventory`; a prefix such as `rest-client` covers every target under it.
 `fault` is a spec such as `unavailable`, `hangs`, `slow:2s`, `dies-mid-request:next-write` or `responds-with:503`.
 `requests`, `body`, `contentType` and `headers` are optional and may be sent empty: `requests` is `"METHOD /path"`, such as `"POST /inventory/reserve"`, to fault only those requests; `body`, `contentType` and `headers` refine `responds-with`, `headers` as one `Name: value` per line, such as `Retry-After: 30`.
 
-If `getStatus` returns `enabled: false`, fault injection is off: ask the developer to add `%dev.quarkus.network-faults.enabled=true` to `application.properties`.
+If `getStatus` returns `enabled: false`, fault injection is off: ask the developer to add `%dev.quarkus.resiliency-testing.enabled=true` to `application.properties`.
 
 ## Safety rules
 
@@ -52,7 +52,7 @@ If `getStatus` returns `enabled: false`, fault injection is off: ask the develop
 
 ## Where to start
 
-1. Read the resource `quarkus-network-faults_inventory`. Its `guardedMethods` list every method guarded by a Fault Tolerance annotation: `class`, `method`, `annotations` with their effective values, and `injects`, the types the class injects that a test can pass to `target(...)`. Read its `notes`: values overridden in configuration are not reflected.
+1. Read the resource `quarkus-resiliency-testing_inventory`. Its `guardedMethods` list every method guarded by a Fault Tolerance annotation: `class`, `method`, `annotations` with their effective values, and `injects`, the types the class injects that a test can pass to `target(...)`. Read its `notes`: values overridden in configuration are not reflected.
 2. Call `getTargets`. Join each injected type to a target through the target's `sourceProperty`: a REST Client interface with `@RegisterRestClient(configKey = "inventory")` is the target whose property is `quarkus.rest-client.inventory.url`, named `rest-client:inventory`; a `javax.sql.DataSource` is `datasource:<default>:jdbc`, a named one `datasource:<name>:jdbc`.
 3. Find the endpoint that reaches the guarded method, by reading the resource classes. You will call it in every experiment.
 
@@ -68,7 +68,7 @@ For each experiment:
 4. **Confirmation.** Check that the fault was exercised, as the next section describes: while it is active, `getEvents` and `getTargets` (and `getRequests` for a plaintext HTTP target); once it has ended, `verdict` in `getHistory`, which settles it. If it was not exercised, the experiment is inconclusive.
 5. **Conclusion.** Held, did not hold, or inconclusive, against the hypothesis.
 6. **End the fault.** `reset` the target, or `resetAll`. Call the endpoint again and record the recovery status.
-7. **Then write the test**, following `quarkus-network-faults_testWritingGuide`: the same target, through the bean the application injects; the same fault, as the Java method matching the spec; the status you observed inside the fault block, and the recovery status after it. Assert what you observed, not what you expected.
+7. **Then write the test**, following `quarkus-resiliency-testing_testWritingGuide`: the same target, through the bean the application injects; the same fault, as the Java method matching the spec; the status you observed inside the fault block, and the recovery status after it. Assert what you observed, not what you expected.
 
 If the conclusion is "did not hold", the test you write documents what the application does now; tell the developer, and let them decide whether the behaviour or the test should change.
 

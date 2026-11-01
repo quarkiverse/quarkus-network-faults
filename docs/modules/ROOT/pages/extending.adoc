@@ -10,7 +10,7 @@ This page is for extension authors who want the connections of their own extensi
 
 Each supported technology is its own module under `extensions/`, added to the build by Quarkus when the matching extension is present (a `dependencyCondition` on the module, a `conditionalDependencies` entry in core).
 
-Another extension does the same, depending only on `quarkus-network-faults-api` at runtime and `quarkus-network-faults-deployment-spi` at build time.
+Another extension does the same, depending only on `quarkus-resiliency-testing-api` at runtime and `quarkus-resiliency-testing-deployment-spi` at build time.
 Its build steps carry `@BuildSteps(onlyIf = NetworkFaultsEnabled.class)`, from the deployment SPI, so they run only when fault injection is on.
 
 == Declare the Properties
@@ -92,7 +92,7 @@ A watch reports the event loops that were blocked while it was open, one line ea
 == Undo the Consequences
 
 An extension that owns state a fault leaves behind, such as a connection pool or a circuit breaker, provides a `ConsequenceCleaner` as a CDI bean.
-Every cleaner bean runs when a fault ends and on `NetworkFaults.resetAll()`.
+Every cleaner bean runs when a fault ends and on `Faults.resetAll()`.
 
 == Going Further
 

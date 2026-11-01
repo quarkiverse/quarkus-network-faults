@@ -1,5 +1,5 @@
-name: Network Faults - Quarkus Data Hibernate
-description: Network fault targets for Quarkus Data repositories, resolved to their datasource; included automatically next to quarkus-network-faults when quarkus-data-hibernate is present
+name: Resiliency Testing - Quarkus Data Hibernate
+description: Network fault targets for Quarkus Data repositories, resolved to their datasource; included automatically next to quarkus-resiliency-testing when quarkus-data-hibernate is present
 metadata:
   keywords:
     - testing

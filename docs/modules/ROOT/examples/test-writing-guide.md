@@ -1,6 +1,6 @@
-# Writing tests with Quarkus Network Faults
+# Writing tests with Quarkus Resiliency Testing
 
-Quarkus Network Faults puts an in-process proxy in front of every outbound connection the application's configuration describes: REST Clients, datasources, Redis, MongoDB, mailers, GraphQL and gRPC clients, Quarkus LangChain4j models, stores and MCP servers.
+Quarkus Resiliency Testing puts an in-process proxy in front of every outbound connection the application's configuration describes: REST Clients, datasources, Redis, MongoDB, mailers, GraphQL and gRPC clients, Quarkus LangChain4j models, stores and MCP servers.
 A `@QuarkusTest` applies a fault to one of those proxies and asserts what the application does while the dependency fails, and after it recovers.
 This guide is everything you need to write such a test.
 Read it in order the first time.
@@ -11,8 +11,8 @@ Add one test dependency; it brings in the extension itself:
 
 ```xml
 <dependency>
-    <groupId>io.quarkiverse.networkfaults</groupId>
-    <artifactId>quarkus-network-faults-junit</artifactId>
+    <groupId>io.quarkiverse.resiliencytesting</groupId>
+    <artifactId>quarkus-resiliency-testing-junit</artifactId>
     <version><!-- the latest release of the extension --></version>
     <scope>test</scope>
 </dependency>
@@ -26,7 +26,7 @@ Every fault test has this shape:
 class OrderResourceTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void inventoryServiceHangs() {
@@ -56,8 +56,8 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.NetworkFaults;
-import io.quarkiverse.networkfaults.junit.NetworkFaultsProfile;
+import io.quarkiverse.resiliencytesting.Faults;
+import io.quarkiverse.resiliencytesting.junit.NetworkFaultsProfile;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 ```
@@ -96,7 +96,7 @@ The first column is the name `getTargets` shows and the configuration property i
 `faults.all()` is every target at once, for an "everything is down" test.
 
 To find the target of a code path: follow the call from the endpoint under test to the injected client, repository or model it uses, and pass that type.
-The Dev MCP resource `quarkus-network-faults_inventory` lists, for each method guarded by a Fault Tolerance annotation, the types its class injects (`injects`); each one is a candidate for `target(...)`.
+The Dev MCP resource `quarkus-resiliency-testing_inventory` lists, for each method guarded by a Fault Tolerance annotation, the types its class injects (`injects`); each one is a candidate for `target(...)`.
 
 ### Some of the requests of a target
 
@@ -201,7 +201,7 @@ An endpoint from a method reference has a `traffic()` too, counting only its req
 
 `HttpRequestRecord` holds `time()`, `connectionId()`, `method()`, `target()` (path and query string), `headers()` and `header(name)`, `bodyFingerprint()` (SHA-256 of the body, null without one), `responseTime()` and `responseStatus()` (both null when the request was never answered or is still in flight; a `respondsWith` answer carries its status).
 
-`Attempts` and `Stopwatch` are in `io.quarkiverse.networkfaults.junit`; `onNextWrite` below is a static import of `io.quarkiverse.networkfaults.Moment.onNextWrite`:
+`Attempts` and `Stopwatch` are in `io.quarkiverse.resiliencytesting.junit`; `onNextWrite` below is a static import of `io.quarkiverse.resiliencytesting.Moment.onNextWrite`:
 
 ```java
 Target api = faults.target(InventoryClient.class);

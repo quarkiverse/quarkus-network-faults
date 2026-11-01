@@ -3,24 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-mongodb-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-mongodb-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-mongodb</artifactId>
-    <name>Quarkus Network Faults - MongoDB - Runtime</name>
-    <description>Network fault targets for the MongoDB client; included automatically next to quarkus-network-faults when quarkus-mongodb-client is present</description>
+    <artifactId>quarkus-resiliency-testing-mongodb</artifactId>
+    <name>Quarkus Resiliency Testing - MongoDB - Runtime</name>
+    <description>Network fault targets for the MongoDB client; included automatically next to quarkus-resiliency-testing when quarkus-mongodb-client is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-mongodb-client</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.mongodb</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-mongodb-client</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.mongodb</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -7,8 +7,8 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.NetworkFaults;
-import io.quarkiverse.networkfaults.junit.NetworkFaultsProfile;
+import io.quarkiverse.resiliencytesting.Faults;
+import io.quarkiverse.resiliencytesting.junit.NetworkFaultsProfile;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.smallrye.reactive.messaging.MutinyEmitter;
@@ -18,7 +18,7 @@ import io.smallrye.reactive.messaging.MutinyEmitter;
 class KafkaFailuresTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void kafkaIsDown() {

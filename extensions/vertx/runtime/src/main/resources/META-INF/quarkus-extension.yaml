@@ -1,5 +1,5 @@
-name: Network Faults - Vert.x
-description: Event loop watching for Vert.x; included automatically when both quarkus-network-faults and quarkus-vertx are present
+name: Resiliency Testing - Vert.x
+description: Event loop watching for Vert.x; included automatically when both quarkus-resiliency-testing and quarkus-vertx are present
 metadata:
   keywords:
     - testing

@@ -3,24 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-fault-tolerance-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-fault-tolerance-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-fault-tolerance</artifactId>
-    <name>Quarkus Network Faults - Fault Tolerance - Runtime</name>
-    <description>Resets SmallRye Fault Tolerance circuit breakers when a network fault ends; included automatically next to quarkus-network-faults when quarkus-smallrye-fault-tolerance is present</description>
+    <artifactId>quarkus-resiliency-testing-fault-tolerance</artifactId>
+    <name>Quarkus Resiliency Testing - Fault Tolerance - Runtime</name>
+    <description>Resets SmallRye Fault Tolerance circuit breakers when a network fault ends; included automatically next to quarkus-resiliency-testing when quarkus-smallrye-fault-tolerance is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-smallrye-fault-tolerance</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.faulttolerance</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-smallrye-fault-tolerance</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.faulttolerance</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

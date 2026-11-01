@@ -9,7 +9,7 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.NetworkFaults;
+import io.quarkiverse.resiliencytesting.Faults;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
@@ -24,7 +24,7 @@ class OrdersSurviveAuditOutageTest {
     private static final io.quarkus.agroal.DataSource AUDIT = new io.quarkus.agroal.DataSource.DataSourceLiteral("audit");
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void aFullAuditPoolLeavesTheOrdersAlone() {

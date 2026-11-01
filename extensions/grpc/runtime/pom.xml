@@ -3,24 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-grpc-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-grpc-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-grpc</artifactId>
-    <name>Quarkus Network Faults - gRPC - Runtime</name>
-    <description>Network fault targets for gRPC clients; included automatically next to quarkus-network-faults when quarkus-grpc is present</description>
+    <artifactId>quarkus-resiliency-testing-grpc</artifactId>
+    <name>Quarkus Resiliency Testing - gRPC - Runtime</name>
+    <description>Network fault targets for gRPC clients; included automatically next to quarkus-resiliency-testing when quarkus-grpc is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-grpc</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.grpc</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-grpc</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.grpc</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

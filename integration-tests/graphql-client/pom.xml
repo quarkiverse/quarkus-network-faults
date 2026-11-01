@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-integration-tests-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-integration-tests-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-integration-tests-graphql-client</artifactId>
-    <name>Quarkus Network Faults - Integration Tests - GraphQL Client</name>
+    <artifactId>quarkus-resiliency-testing-integration-tests-graphql-client</artifactId>
+    <name>Quarkus Resiliency Testing - Integration Tests - GraphQL Client</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.it.graphqlclient</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.it.graphqlclient</automatic.module.name>
     </properties>
 
     <dependencies>

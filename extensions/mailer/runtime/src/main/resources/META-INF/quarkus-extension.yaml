@@ -1,5 +1,5 @@
-name: Network Faults - Mailer
-description: Network fault targets for the Mailer; included automatically next to quarkus-network-faults when quarkus-mailer is present
+name: Resiliency Testing - Mailer
+description: Network fault targets for the Mailer; included automatically next to quarkus-resiliency-testing when quarkus-mailer is present
 metadata:
   keywords:
     - testing

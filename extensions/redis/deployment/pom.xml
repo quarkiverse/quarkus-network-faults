@@ -3,26 +3,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-redis-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-redis-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-redis-deployment</artifactId>
-    <name>Quarkus Network Faults - Redis - Deployment</name>
+    <artifactId>quarkus-resiliency-testing-redis-deployment</artifactId>
+    <name>Quarkus Resiliency Testing - Redis - Deployment</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.redis.deployment</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.redis.deployment</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment-spi</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-redis</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-redis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

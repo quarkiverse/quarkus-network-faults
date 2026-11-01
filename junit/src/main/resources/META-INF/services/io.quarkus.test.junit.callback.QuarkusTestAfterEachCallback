@@ -1,1 +1,1 @@
-io.quarkiverse.networkfaults.junit.NetworkFaultsAfterEachCallback
+io.quarkiverse.resiliencytesting.junit.FaultsAfterEachCallback

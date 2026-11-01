@@ -3,24 +3,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-data-hibernate-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-data-hibernate-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-data-hibernate</artifactId>
-    <name>Quarkus Network Faults - Quarkus Data Hibernate - Runtime</name>
-    <description>Network fault targets for Quarkus Data repositories, resolved to their datasource; included automatically next to quarkus-network-faults when quarkus-data-hibernate is present</description>
+    <artifactId>quarkus-resiliency-testing-data-hibernate</artifactId>
+    <name>Quarkus Resiliency Testing - Quarkus Data Hibernate - Runtime</name>
+    <description>Network fault targets for Quarkus Data repositories, resolved to their datasource; included automatically next to quarkus-resiliency-testing when quarkus-data-hibernate is present</description>
 
     <properties>
         <!-- the Quarkus extension whose presence brings this module into a build -->
-        <network-faults.requires>io.quarkus:quarkus-data-hibernate</network-faults.requires>
-        <automatic.module.name>io.quarkiverse.networkfaults.datahibernate</automatic.module.name>
+        <resiliency-testing.requires>io.quarkus:quarkus-data-hibernate</resiliency-testing.requires>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.datahibernate</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-api</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -14,7 +14,7 @@ import io.smallrye.mutiny.Multi;
 
 /**
  * A stand-in for the inventory service, served by this very application so that the demo needs nothing else running.
- * The REST Client reaches it through the Network faults proxy, as it would reach a real service.
+ * The REST Client reaches it through the Resiliency Testing proxy, as it would reach a real service.
  */
 @Path("/inventory")
 public class InventoryResource {

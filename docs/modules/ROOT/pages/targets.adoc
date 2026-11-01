@@ -9,7 +9,7 @@ xref:faults.adoc[Faults] are applied to it.
 == Overview
 
 Targets are discovered from configuration and addressed by the CDI bean the application uses to reach them.
-`NetworkFaults` has no method that knows a technology; the extension owning the bean recognises it behind the scenes.
+`Faults` has no method that knows a technology; the extension owning the bean recognises it behind the scenes.
 
 [source,java]
 ----
@@ -144,7 +144,7 @@ NOTE: A registry name such as `datasource:<default>:jdbc` cannot be used to sele
 |`grpc-client:<name>`
 |===
 
-`NetworkFaults` itself knows nothing about datasources or REST Clients.
+`Faults` itself knows nothing about datasources or REST Clients.
 Each technology module holds its descriptors and its `BeanTargetResolver`, so a new extension brings both; see xref:extending.adoc[Declaring Targets from Another Extension].
 
 == REST Client
@@ -269,7 +269,7 @@ environment:
 +
 [source,properties]
 ----
-quarkus.network-faults.reserved-port.kafka.bootstrap.servers=19092
+quarkus.resiliency-testing.reserved-port.kafka.bootstrap.servers=19092
 ----
 
 The proxy binds to port 19092, the interceptor rewrites `kafka.bootstrap.servers` to point there, and the broker advertises the same port, so reconnections after metadata refresh go through the proxy.

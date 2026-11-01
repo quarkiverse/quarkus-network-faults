@@ -1,5 +1,5 @@
-name: Network Faults - GraphQL Client
-description: Network fault targets for the SmallRye GraphQL client; included automatically next to quarkus-network-faults when quarkus-smallrye-graphql-client is present
+name: Resiliency Testing - GraphQL Client
+description: Network fault targets for the SmallRye GraphQL client; included automatically next to quarkus-resiliency-testing when quarkus-smallrye-graphql-client is present
 metadata:
   keywords:
     - testing

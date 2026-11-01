@@ -1,5 +1,5 @@
-name: Network Faults - Redis
-description: Network fault targets for the Redis client; included automatically next to quarkus-network-faults when quarkus-redis-client is present
+name: Resiliency Testing - Redis
+description: Network fault targets for the Redis client; included automatically next to quarkus-resiliency-testing when quarkus-redis-client is present
 metadata:
   keywords:
     - testing

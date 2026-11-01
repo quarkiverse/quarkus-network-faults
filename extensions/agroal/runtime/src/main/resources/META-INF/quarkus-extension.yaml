@@ -1,5 +1,5 @@
-name: Network Faults - Agroal
-description: Network fault targets for Agroal, included automatically when both quarkus-network-faults and the Agroal extension are present
+name: Resiliency Testing - Agroal
+description: Network fault targets for Agroal, included automatically when both quarkus-resiliency-testing and the Agroal extension are present
 metadata:
   keywords:
     - testing

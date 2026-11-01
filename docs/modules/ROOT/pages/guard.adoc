@@ -77,7 +77,7 @@ An exhaustion the guard cannot watch is reported as _not judged_, as `unavailabl
 
 == After Each Test
 
-The guard and the cleanup run after each `@QuarkusTest` with the `quarkus-network-faults-junit` module on the classpath, with or without `NetworkFaultsProfile`: every fault is ended and its consequences are undone, which means Agroal pools are flushed and SmallRye Fault Tolerance circuit breakers are reset, all of it after the last exhaustion has ended.
+The guard and the cleanup run after each `@QuarkusTest` with the `quarkus-resiliency-testing-junit` module on the classpath, with or without `NetworkFaultsProfile`: every fault is ended and its consequences are undone, which means Agroal pools are flushed and SmallRye Fault Tolerance circuit breakers are reset, all of it after the last exhaustion has ended.
 
 == Going Further
 

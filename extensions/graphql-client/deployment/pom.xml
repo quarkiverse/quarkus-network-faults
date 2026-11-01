@@ -3,26 +3,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.networkfaults</groupId>
-        <artifactId>quarkus-network-faults-graphql-client-parent</artifactId>
+        <groupId>io.quarkiverse.resiliencytesting</groupId>
+        <artifactId>quarkus-resiliency-testing-graphql-client-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-network-faults-graphql-client-deployment</artifactId>
-    <name>Quarkus Network Faults - GraphQL Client - Deployment</name>
+    <artifactId>quarkus-resiliency-testing-graphql-client-deployment</artifactId>
+    <name>Quarkus Resiliency Testing - GraphQL Client - Deployment</name>
 
     <properties>
-        <automatic.module.name>io.quarkiverse.networkfaults.graphqlclient.deployment</automatic.module.name>
+        <automatic.module.name>io.quarkiverse.resiliencytesting.graphqlclient.deployment</automatic.module.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-deployment-spi</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-deployment-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.quarkiverse.networkfaults</groupId>
-            <artifactId>quarkus-network-faults-graphql-client</artifactId>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-graphql-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

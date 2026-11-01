@@ -1,5 +1,5 @@
-name: Network Faults - LangChain4j MCP
-description: Network fault targets for the MCP servers of Quarkus LangChain4j, included automatically when both quarkus-network-faults and quarkus-langchain4j-mcp are present
+name: Resiliency Testing - LangChain4j MCP
+description: Network fault targets for the MCP servers of Quarkus LangChain4j, included automatically when both quarkus-resiliency-testing and quarkus-langchain4j-mcp are present
 metadata:
   keywords:
     - testing

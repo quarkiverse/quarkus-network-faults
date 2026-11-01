@@ -1,6 +1,6 @@
 package org.acme.stock;
 
-import static io.quarkiverse.networkfaults.Moment.Http.afterSseEvents;
+import static io.quarkiverse.resiliencytesting.Moment.Http.afterSseEvents;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
@@ -12,9 +12,9 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.ActiveFault;
-import io.quarkiverse.networkfaults.NetworkFaults;
-import io.quarkiverse.networkfaults.junit.Stopwatch;
+import io.quarkiverse.resiliencytesting.ActiveFault;
+import io.quarkiverse.resiliencytesting.Faults;
+import io.quarkiverse.resiliencytesting.junit.Stopwatch;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -33,7 +33,7 @@ class StreamStallIsBoundedTest {
     private static final Duration PATIENCE = Duration.ofSeconds(10);
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @Test
     void aStalledStreamFailsAfterOneQuietSecond() {

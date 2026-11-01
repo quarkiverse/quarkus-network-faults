@@ -1,5 +1,5 @@
-name: Network Faults - LangChain4j
-description: Network fault targets for LangChain4j, included automatically when both quarkus-network-faults and the LangChain4j extension are present
+name: Resiliency Testing - LangChain4j
+description: Network fault targets for LangChain4j, included automatically when both quarkus-resiliency-testing and the LangChain4j extension are present
 metadata:
   keywords:
     - testing

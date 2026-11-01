@@ -1,7 +1,7 @@
-name: Network Faults
+name: Resiliency Testing
 description: Inject network faults and overload into a Quarkus application during tests
 metadata:
-  guide: https://docs.quarkiverse.io/quarkus-network-faults/dev/index.html
+  guide: https://docs.quarkiverse.io/quarkus-resiliency-testing/dev/index.html
   keywords:
     - testing
     - fault-injection

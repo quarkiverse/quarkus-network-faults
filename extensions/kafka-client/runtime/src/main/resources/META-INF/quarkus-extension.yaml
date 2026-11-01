@@ -1,5 +1,5 @@
-name: Network Faults - Kafka Client
-description: Network fault targets for Kafka Client, included automatically when both quarkus-network-faults and the Kafka Client extension are present
+name: Resiliency Testing - Kafka Client
+description: Network fault targets for Kafka Client, included automatically when both quarkus-resiliency-testing and the Kafka Client extension are present
 metadata:
   keywords:
     - testing

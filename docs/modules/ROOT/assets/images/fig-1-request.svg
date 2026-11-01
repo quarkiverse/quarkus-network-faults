@@ -23,7 +23,7 @@
 <text class="mono" x="166.0" y="100" text-anchor="middle">= http://inventory:8080</text>
 <line class="ln" x1="296" y1="88" x2="334" y2="88" marker-end="url(#ah)"/>
 <rect class="box" x="336" y="64" width="170" height="48" rx="3"/>
-<text class="t" x="421.0" y="92" text-anchor="middle">NetworkFaultsInterceptor</text>
+<text class="t" x="421.0" y="92" text-anchor="middle">FaultsInterceptor</text>
 <line class="ln" x1="506" y1="88" x2="544" y2="88" marker-end="url(#ah)"/>
 <rect class="box" x="546" y="64" width="114" height="48" rx="3"/>
 <text class="mono" x="603.0" y="92" text-anchor="middle">127.0.0.1:41234</text>

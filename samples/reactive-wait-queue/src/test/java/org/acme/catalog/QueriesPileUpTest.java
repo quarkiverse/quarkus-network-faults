@@ -14,7 +14,7 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.networkfaults.NetworkFaults;
+import io.quarkiverse.resiliencytesting.Faults;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.vertx.mutiny.sqlclient.Pool;
@@ -28,7 +28,7 @@ import io.vertx.mutiny.sqlclient.Pool;
 class QueriesPileUpTest {
 
     @Inject
-    NetworkFaults faults;
+    Faults faults;
 
     @TestHTTPResource("/catalog")
     URI catalog;
