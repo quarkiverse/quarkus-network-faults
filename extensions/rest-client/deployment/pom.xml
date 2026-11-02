@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.quarkiverse.resiliencytesting</groupId>
         <artifactId>quarkus-resiliency-testing-rest-client-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>0.4.0</version>
     </parent>
     <artifactId>quarkus-resiliency-testing-rest-client-deployment</artifactId>
     <name>Quarkus Resiliency Testing - REST Client - Deployment</name>
