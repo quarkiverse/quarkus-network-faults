@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.resiliencytesting/quarkus-resiliency-testing?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.resiliencytesting/quarkus-resiliency-testing)
 [![Documentation](https://img.shields.io/badge/docs-quarkiverse-4695EB?logo=quarkus&style=flat-square)](https://docs.quarkiverse.io/quarkus-resiliency-testing/dev/index.html)
-[![Quarkus](https://img.shields.io/badge/Quarkus-4.0.0.Beta1%2B-4695EB?logo=quarkus&style=flat-square)](https://quarkus.io/)
+[![Quarkus](https://img.shields.io/badge/Quarkus-4.0.0.Beta2%2B-4695EB?logo=quarkus&style=flat-square)](https://quarkus.io/)
 
 **Make a dependency fail on purpose, inside your `@QuarkusTest`.**
 
