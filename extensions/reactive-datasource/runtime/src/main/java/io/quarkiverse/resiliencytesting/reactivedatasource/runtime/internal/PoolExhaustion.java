@@ -5,8 +5,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 
 import io.quarkiverse.resiliencytesting.datasource.ContentionSampler;
 import io.quarkiverse.resiliencytesting.spi.Exhaustion;
@@ -64,16 +62,14 @@ final class PoolExhaustion implements Exhaustion {
         for (int i = 0; i < maxSize; i++) {
             Future<SqlConnection> connection = pool.getConnection();
             try {
-                exhaustion.held.add(connection.toCompletionStage().toCompletableFuture()
-                        .orTimeout(SETUP_WAIT.toNanos(), TimeUnit.NANOSECONDS)
-                        .join());
-            } catch (CompletionException e) {
-                // only this wait gave up: the request stays queued for the pool's own, longer timeout, and a
-                // connection it receives after that goes straight back
+                exhaustion.held.add(connection.await(SETUP_WAIT));
+            } catch (Exception e) {
+                // the pool refused, or only this wait gave up: then the request stays queued for the pool's own,
+                // longer timeout, and a connection it receives after that goes straight back
                 connection.onSuccess(SqlConnection::close);
                 exhaustion.release();
                 throw new IllegalStateException("Could not take all " + maxSize + " connections of " + target
-                        + ": the application holds some of them and did not give them back in time", e.getCause());
+                        + ": the application holds some of them and did not give them back in time", e);
             }
         }
         if (sampler != null) {
@@ -125,8 +121,8 @@ final class PoolExhaustion implements Exhaustion {
             try {
                 // closing a pooled connection returns it to the pool; wait for that, so the pool is whole again
                 // before the test asserts recovery
-                connection.close().toCompletionStage().toCompletableFuture().join();
-            } catch (CompletionException ignored) {
+                connection.close().await();
+            } catch (Exception ignored) {
                 // the pool takes the connection back regardless; a broken one is destroyed there
             }
         }
