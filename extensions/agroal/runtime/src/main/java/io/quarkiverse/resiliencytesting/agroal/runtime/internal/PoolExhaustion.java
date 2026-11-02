@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import io.agroal.api.AgroalDataSource;
 import io.agroal.api.configuration.AgroalDataSourceConfiguration;
@@ -69,10 +67,10 @@ final class PoolExhaustion implements Exhaustion {
             for (int i = 0; i < maxSize; i++) {
                 exhaustion.held.add(acquireOnOwnThread(dataSource, setupWait));
             }
-        } catch (SQLException | TimeoutException e) {
+        } catch (CompletionException e) {
             exhaustion.release();
             throw new IllegalStateException("Could not take all " + maxSize + " connections of " + target
-                    + ": the application holds some of them and did not give them back in time", e);
+                    + ": the application holds some of them and did not give them back in time", e.getCause());
         }
         if (exhaustion.sampler != null) {
             exhaustion.sampler.start();
@@ -83,12 +81,12 @@ final class PoolExhaustion implements Exhaustion {
     /**
      * Agroal remembers which thread holds each connection and, with strict multiple acquisition, refuses a second
      * one to the same thread; a thread of its own per connection keeps the pool none the wiser.
-     *
-     * @throws TimeoutException if the pool had no connection within {@code setupWait}; the acquisition stays queued
-     *         for the pool's own timeout, and a connection it receives after that goes straight back
+     * <p>
+     * A platform thread, not a virtual one: for a virtual caller Agroal opens a missing connection on its
+     * housekeeping executor and waits for it only as long as the acquisition timeout, so a cold pool with a timeout
+     * shorter than opening a connection could not be taken whole.
      */
-    private static Connection acquireOnOwnThread(AgroalDataSource dataSource, Duration setupWait)
-            throws SQLException, TimeoutException {
+    private static Connection acquireOnOwnThread(AgroalDataSource dataSource, Duration setupWait) {
         CompletableFuture<Connection> acquisition = CompletableFuture.supplyAsync(() -> {
             try {
                 return dataSource.getConnection();
@@ -97,18 +95,13 @@ final class PoolExhaustion implements Exhaustion {
             }
         }, Thread.ofPlatform().daemon()::start);
         try {
-            return acquisition.get(setupWait.toNanos(), TimeUnit.NANOSECONDS);
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof SQLException sql) {
-                throw sql;
-            }
-            throw new CompletionException(e.getCause());
-        } catch (TimeoutException e) {
+            // a copy, so that the timeout fails this wait and not the acquisition itself
+            return acquisition.copy().orTimeout(setupWait.toNanos(), TimeUnit.NANOSECONDS).join();
+        } catch (CompletionException e) {
+            // the pool refused, or only this wait gave up: then the acquisition stays queued for the pool's own
+            // timeout, and a connection it receives after that goes straight back
             acquisition.thenAccept(PoolExhaustion::giveBack);
             throw e;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new CompletionException(e);
         }
     }
 
